@@ -2,6 +2,13 @@
 
 Bug reports, meter reports and pull requests are welcome.
 
+Looking for something to work on? The issues labelled
+[help wanted](https://github.com/ViezeVingertjes/piepr/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
+are ready to pick up, and
+[roadmap](https://github.com/ViezeVingertjes/piepr/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap)
+shows what is planned. For anything bigger, say in the issue what you intend before
+you start, so the approach can be agreed first.
+
 ## Meter reports
 
 Reports about the meter you use it on help a lot, also when everything just
