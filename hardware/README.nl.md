@@ -23,7 +23,7 @@ inclusief verzending en je houdt over voor meer. Prijzen bekeken op 27 nov 2026
 | Schottky-diode **1N5819** (DO-41) | €0,01 | [AliExpress](https://www.aliexpress.com/item/32886942865.html) | `1N5819 DO-41` |
 | Totaal | €5,35 | | |
 | USB-C-kabel (USB-A naar C) + USB-lader van 5 V | | heeft bijna iedereen liggen | `5V USB charger` |
-| Optioneel: condensator van 470–1000 µF | | alleen als een DSMR 5-meter het bordje voedt | `1000uF 10V capacitor` |
+| Optioneel: condensator van 470 µF | | alleen als een DSMR 5-meter het bordje voedt | `470uF 16V capacitor` |
 
 Neem een kabel van **USB-A naar USB-C**: veel SuperMini-klonen starten niet op aan een
 lader met USB-C naar C (PD). Elke lader van 5 V is sterk genoeg: het bordje gebruikt
@@ -71,10 +71,14 @@ draad die erbij hoort.
 |---|---|---|---|---|---|---|
 | draadkleur | | | | | | |
 
-### Stap 2 (optioneel): Meten aan de meter
-Steek de stekker in de meter en houd de losse draadeinden uit elkaar. Gelijkspanning:
-- pin 1 tegen pin 6: ~5 V. Meet je bij een DSMR 4-meter 0 V, ga dan gewoon door: het
-  bordje krijgt stroom via USB.
+### Stap 2: Meten aan de meter
+Steek de stekker in de meter en houd de losse draadeinden uit elkaar. Gelijkspanning,
+met de rode meetpen op de pin die als eerste genoemd wordt:
+- pin 1 tegen pin 6: ongeveer **+5 V**. Meet je **−5 V**, dan zitten de draden in
+  gespiegelde volgorde: je hield de stekker bij stap 1 andersom, dus doe die stap
+  opnieuw. Sluit het bordje nooit aan met gespiegelde draden: dat kan de meter
+  beschadigen. Meet je bij een DSMR 4-meter 0 V, ga dan gewoon door: het bordje krijgt
+  stroom via USB.
 - pin 5 tegen pin 3: ~0 V (normaal zonder pull-up).
 
 Haal de stekker eruit voordat je gaat solderen.
@@ -136,7 +140,7 @@ de [firmwaregids](../firmware/README.md) (Engels).
 | `crc` / `uart errors` hoog in het log | controleer de pull-up van 2,2 kΩ en de datadraad op vlakje 4 |
 | Wifi valt weg (RSSI slechter dan −80 dBm) | het signaal bij de meter is te zwak: zet een accesspoint dichterbij, of soldeer een draad van 31 mm aan de antenne van het bordje |
 | Bordje verschijnt niet via USB | kabel met datalijnen? groep `dialout`? Houd BOOT ingedrukt, druk kort op RST, laat BOOT los |
-| Herstart zomaar | zwakke lader; voedt een DSMR 5-meter het bordje, zet dan 470–1000 µF tussen 5V en G |
+| Herstart zomaar | zwakke lader; voedt een DSMR 5-meter het bordje, zet dan 470 µF tussen 5V en G |
 
 ## Veiligheid
 - De P1-poort is laagspanning en gescheiden van het lichtnet; je komt niet aan 230 V.

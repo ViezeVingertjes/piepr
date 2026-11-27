@@ -23,7 +23,7 @@ change: the search term always works.
 | Schottky diode **1N5819** (DO-41) | €0.01 | [AliExpress](https://www.aliexpress.com/item/32886942865.html) | `1N5819 DO-41` |
 | Total | €5.35 | | |
 | USB-C cable (USB-A to C) + 5 V USB charger | | most people have these | `5V USB charger` |
-| Optional: 470–1000 µF capacitor | | only if a DSMR 5 meter powers the board | `1000uF 10V capacitor` |
+| Optional: 470 µF capacitor | | only if a DSMR 5 meter powers the board | `470uF 16V capacitor` |
 
 Use a **USB-A to USB-C** cable: many SuperMini clones don't power up from a
 USB-C-to-C (PD) charger. Any 5 V charger is strong enough: the board draws about
@@ -68,10 +68,13 @@ multimeter in beep mode, find which loose wire belongs to each contact.
 |---|---|---|---|---|---|---|
 | wire colour | | | | | | |
 
-### Step 2 (optional): Measure at the meter
-Plug into the meter with the loose ends apart. DC volts:
-- pin 1 vs pin 6: ~5 V. If a DSMR 4 meter shows 0 V here, carry on: the board runs
-  from USB.
+### Step 2: Measure at the meter
+Plug into the meter with the loose ends apart. DC volts, red probe on the pin named
+first:
+- pin 1 vs pin 6: about **+5 V**. If it reads **−5 V**, the wires are in mirrored
+  order: the plug was held the other way round in step 1, so do that step again.
+  Never connect the board with the wires mirrored: it can damage the meter. If a
+  DSMR 4 meter shows 0 V here, carry on: the board runs from USB.
 - pin 5 vs pin 3: ~0 V (normal without pull-up).
 
 Unplug before soldering.
@@ -132,7 +135,7 @@ the [firmware guide](../firmware/README.md).
 | `crc` / `uart errors` high in the log | check the 2.2 kΩ pull-up and the data wire on pad 4 |
 | WiFi drops (RSSI worse than −80 dBm) | the signal at the meter is too weak: put an access point closer, or solder a 31 mm wire to the board's antenna |
 | Board not seen over USB | data-capable cable? `dialout` group? Hold BOOT, tap RST, release BOOT |
-| Random resets | weak charger; if a DSMR 5 meter powers the board, add 470–1000 µF across 5V and G |
+| Random resets | weak charger; if a DSMR 5 meter powers the board, add 470 µF across 5V and G |
 
 ## Safety
 - The P1 port is low voltage and isolated from the mains; you don't touch 230 V.
