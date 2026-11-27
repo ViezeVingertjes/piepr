@@ -27,7 +27,8 @@ always works.
 | Optional: 470–1000 µF capacitor | only if a DSMR 5 meter powers the board | | | `1000uF 10V capacitor` |
 
 Use a **USB-A to USB-C** cable: many SuperMini clones don't power up from a
-USB-C-to-C (PD) charger.
+USB-C-to-C (PD) charger. Any 5 V charger is strong enough: the board draws about
+0.08 A, and about 0.12 A at most.
 
 Tools: soldering iron, multimeter (beep mode + DC volts), wire stripper, lighter or heat gun.
 

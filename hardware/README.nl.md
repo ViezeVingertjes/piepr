@@ -30,7 +30,8 @@ de zoekterm werkt altijd.
 | Optioneel: condensator van 470–1000 µF | alleen als een DSMR 5-meter het bordje voedt | | | `1000uF 10V capacitor` |
 
 Neem een kabel van **USB-A naar USB-C**: veel SuperMini-klonen starten niet op aan een
-lader met USB-C naar C (PD).
+lader met USB-C naar C (PD). Elke lader van 5 V is sterk genoeg: het bordje gebruikt
+ongeveer 0,08 A, en hooguit ongeveer 0,12 A.
 
 Gereedschap: soldeerbout, multimeter (pieptoon + gelijkspanning), striptang, aansteker
 of heteluchtpistool.
