@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """A pretend smart meter: writes valid P1 telegrams, for testing without a meter.
 
-    p1sim.py --tcp            serve telegrams on port 8088, like a Piepr does
-    p1sim.py --serial DEVICE  write them to a serial port (115200 8N1)
-    p1sim.py --stdout         print them
+    p1sim.py --tcp      serve telegrams on port 8088, like a Piepr does
+    p1sim.py --stdout   print them
 
-See firmware/docs/simulator.md. Only --serial needs something installed (pyserial).
+See firmware/docs/simulator.md. Needs Python 3.9 or newer and nothing else.
 """
 from __future__ import annotations
 
@@ -128,7 +127,7 @@ class TcpReaders:
 
 
 class Stream:
-    """Standard output or a serial port."""
+    """Standard output."""
 
     def __init__(self, out):
         self.out = out
@@ -141,17 +140,6 @@ class Stream:
         self.out.flush()
 
 
-def open_serial(device: str):
-    try:
-        import serial
-    except ImportError:
-        sys.exit("--serial needs pyserial: pip install pyserial")
-    try:
-        return serial.Serial(device, 115200)
-    except serial.SerialException as error:
-        sys.exit(f"can't open {device}: {error}")
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Write P1 telegrams like a smart meter does.")
     parser.add_argument("--version", type=int, choices=(4, 5), default=5, help="DSMR version (default 5)")
@@ -161,15 +149,12 @@ def main() -> None:
     target.add_argument("--stdout", action="store_true", help="print the telegrams")
     target.add_argument("--tcp", type=int, nargs="?", const=DEFAULT_PORT, metavar="PORT",
                         help=f"serve them over TCP (default port {DEFAULT_PORT})")
-    target.add_argument("--serial", metavar="DEVICE", help="write them to a serial port at 115200 8N1")
     args = parser.parse_args()
 
     interval = INTERVAL_S[args.version] if args.interval is None else args.interval
     if args.tcp is not None:
         sink = TcpReaders(args.tcp)
         print(f"serving DSMR {args.version} telegrams on port {args.tcp}", file=sys.stderr)
-    elif args.serial:
-        sink = Stream(open_serial(args.serial))
     else:
         sink = Stream(sys.stdout.buffer)
 
