@@ -62,7 +62,7 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
 </head>
 <body>
 <main>
-<div class="top">[[>brand]]<a class="lang" href="/?lang=[[@other]]" lang="[[@other]]">[[@other-name]]</a></div>
+<div class="top">[[>brand]]<a class="lang" id="lang" href="/?lang=[[@other]]" lang="[[@other]]">[[@other-name]]</a></div>
 <h1>[[Connect Piepr to WiFi]]</h1>
 <div class="meter js-only" aria-hidden="true"><i></i><i></i><i></i></div>
 <p class="banner" id="banner" role="alert" hidden></p>
@@ -113,6 +113,7 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
   var SSID_MAX = 32, PASS_MIN = 8, PASS_MAX = 63; /* bytes, as checked on the device */
   var BAR_DBM = [-75, -67, -55];                  /* signal needed for bars 2, 3 and 4 */
   var SCAN_POLL_MS = 1000, SCAN_POLLS = 60, KEEPALIVE_MS = 60000;
+  var KEPT = "piepr-setup"; /* sessionStorage: what the language link carries over */
   var $ = function (id) { return document.getElementById(id); };
   var ssid = $("ssid"), pass = $("pass");
   var steps = ["step-network", "step-password", "step-confirm", "step-done"];
@@ -125,6 +126,7 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
   };
   var current = function (id) { return $(id).classList.contains("current"); };
   var openPick = function () { return picked !== null && !picked.secure; };
+  var otherOpen = function () { return !$("other").classList.contains("no-js"); };
 
   function show(id) {
     var n = steps.indexOf(id);
@@ -176,6 +178,7 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
       if (net.secure) { btn.insertAdjacentHTML("beforeend", LOCK); }
       btn.appendChild(bars(net.rssi));
     }
+    if (net ? picked !== null && picked.ssid === net.ssid : otherOpen()) { btn.setAttribute("aria-current", "true"); }
     btn.addEventListener("click", function () {
       document.querySelectorAll(".net").forEach(function (b) { b.removeAttribute("aria-current"); });
       btn.setAttribute("aria-current", "true");
@@ -231,7 +234,8 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
     $("scan-status").textContent = msg;
   }
 
-  function rescan() {
+  /* Shows the networks: after a new scan, or (`fresh` false) the list the device has. */
+  function load(fresh) {
     var polls = 0;
     function failed() { scanning(false, "[[Scan failed. Still on Piepr-Setup? Tap ↻ to retry.]]"); }
     /* A poll can drop while the hotspot is off-channel: retry until SCAN_POLLS. */
@@ -246,19 +250,37 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
           $("banner").textContent = REASONS[state.reason](state.reason_ssid);
           $("banner").hidden = false;
         }
-        if (!state.scanning) {
-          list(state.networks);
-          scanning(false, state.networks.length ? "" : "[[No networks with a good signal found.]]");
-          return;
-        }
-        poll();
+        if (state.scanning) { fresh = true; poll(); return; }
+        if (!fresh && !state.networks.length) { load(true); return; }
+        list(state.networks);
+        scanning(false, state.networks.length ? "" : "[[No networks with a good signal found.]]");
       });
     }
     scanning(true, "[[Looking for networks… (about 10 s)]]");
-    fetch("/api/scan", { method: "POST" }).then(check).catch(failed);
+    (fresh ? fetch("/api/scan", { method: "POST" }) : fetch("/api/state")).then(check).catch(failed);
   }
 
-  $("rescan").addEventListener("click", rescan);
+  /* The language link loads the other page. It takes along where we are, so that
+   * page opens on the same step with the same list instead of scanning again. */
+  $("lang").addEventListener("click", function (e) {
+    try {
+      sessionStorage.setItem(KEPT, JSON.stringify({
+        step: steps.filter(current)[0], picked: picked, ssid: ssid.value, pass: pass.value, other: otherOpen()
+      }));
+    } catch (err) { return; } /* no storage: a plain link, which starts over */
+    e.preventDefault();
+    location.replace(e.currentTarget.href);
+  });
+
+  function takeKept() {
+    try {
+      var kept = JSON.parse(sessionStorage.getItem(KEPT));
+      sessionStorage.removeItem(KEPT);
+      return kept;
+    } catch (err) { return null; }
+  }
+
+  $("rescan").addEventListener("click", function () { load(true); });
   $("other-next").addEventListener("click", function () { if (checkSsid()) { askPass(); } else { ssid.focus(); } });
   $("pass-next").addEventListener("click", function () { if (checkPass()) { confirm(); } else { pass.focus(); } });
   $("pass-back").addEventListener("click", function () { show("step-network"); });
@@ -278,15 +300,27 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
     save.disabled = true;
     fetch($("form").action, { method: "POST", body: new URLSearchParams(new FormData($("form"))) })
       .then(function (r) {
-        if (r.ok) { $("done-ssid").textContent = ssid.value; show("step-done"); return; }
+        /* The device restarts now: the language link would lead nowhere. */
+        if (r.ok) { $("done-ssid").textContent = ssid.value; $("lang").hidden = true; show("step-done"); return; }
         fail(r.status === 400 ? "[[Name or password not accepted.]]" : "[[Saving failed. Try again.]]");
       })
       .catch(function () { fail("[[No reply. If Piepr’s light stays on, it’s saved; otherwise rejoin Piepr-Setup and try again.]]"); });
   });
 
-  show("step-network");
+  var kept = takeKept();
+  if (kept) {
+    picked = kept.picked;
+    ssid.value = kept.ssid;
+    pass.value = kept.pass;
+    $("other").classList.toggle("no-js", !kept.other);
+  }
   list([]);
-  rescan();
+  show("step-network");
+  if (kept && kept.step !== "step-network") {
+    if (!openPick()) { askPass(); }
+    if (kept.step === "step-confirm") { confirm(); }
+  }
+  load(!kept);
   /* Page activity keeps the device's setup window open while someone types. */
   setInterval(function () { fetch("/api/state").catch(function () {}); }, KEEPALIVE_MS);
 })();
