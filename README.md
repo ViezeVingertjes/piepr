@@ -3,10 +3,9 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/ViezeVingertjes/piepr/actions/workflows/ci.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/ViezeVingertjes/piepr/ci.yml?branch=main&label=build&labelColor=0E2236"></a>
+  <a href="https://github.com/ViezeVingertjes/piepr/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/ViezeVingertjes/piepr?label=release&labelColor=0E2236&color=FFC21A"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-FFC21A?labelColor=0E2236"></a>
-  <img alt="DSMR 4 and 5" src="https://img.shields.io/badge/DSMR-4%20%7C%205-FFC21A?labelColor=0E2236">
-  <img alt="ESP32-C3" src="https://img.shields.io/badge/board-ESP32--C3%20SuperMini-FFC21A?labelColor=0E2236">
-  <img alt="ESP-IDF 6.1" src="https://img.shields.io/badge/ESP--IDF-6.1-FFC21A?labelColor=0E2236">
 </p>
 
 **Piepr** is a small open-source reader for Dutch and Belgian smart meters. Plug it
@@ -69,8 +68,8 @@ meter? Open a [meter report](https://github.com/ViezeVingertjes/piepr/issues/new
 
 ## Build your own
 
-1. **Hardware:** parts list (about €16), wiring and checks in the [build guide](hardware/README.md).
-2. **Firmware:** flash the [latest release](https://github.com/ViezeVingertjes/piepr/releases/latest)
+1. Hardware: parts list (about €16), wiring and checks in the [build guide](hardware/README.md).
+2. Firmware: flash the [latest release](https://github.com/ViezeVingertjes/piepr/releases/latest)
    straight from your browser, or build your own; see the [firmware guide](firmware/README.md).
 
 | Folder | Contents |

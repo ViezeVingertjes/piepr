@@ -7,8 +7,8 @@ evening with a soldering iron and a multimeter.
 
 ## 1. Parts
 
-Building your first Piepr costs about **€16 delivered** from AliExpress; the parts
-in one Piepr are worth about **€5.40**, so the spares go a long way. The first four
+Building your first Piepr costs about €16 delivered from AliExpress; the parts
+in one Piepr are worth about €5.40, so the spares go a long way. The first four
 packs ship free together (order over €10); the diodes ship separately. Prices
 checked 27 Nov 2026 (Netherlands). Links die and prices change: the search term
 always works.
@@ -20,7 +20,7 @@ always works.
 | Resistor **2.2 kΩ**, 1/4 W (1–4.7 kΩ works) | [100, variant 2.2K](https://www.aliexpress.com/item/1005005669886834.html) | €2.40 | €0.02 | `2.2K 1/4W resistor` |
 | Heat shrink, 2 mm and 3 mm | [kit of 127](https://www.aliexpress.com/item/1005008123196951.html) | €1.99 | €0.05 | `heat shrink kit` |
 | Schottky diode **1N5819** (DO-41) | [100](https://www.aliexpress.com/item/32886942865.html) | €1.18 + €3.53 shipping | €0.01 | `1N5819 DO-41` |
-| **Total** | | **€15.85** | **€5.36** | |
+| Total | | €15.85 | €5.36 | |
 | USB-C cable (USB-A to C) + 5 V USB charger | most people have these | | | `5V USB charger` |
 | Optional: 470–1000 µF capacitor | only if a DSMR 5 meter powers the board | | | `1000uF 10V capacitor` |
 
@@ -38,12 +38,12 @@ Board top view, **USB-C up**: the right-hand row is
 
 | P1 pin | Function | Inline part | → Board pad |
 |---|---|---|---|
-| 1 | +5 V (DSMR 5 only; 0 V on DSMR 4) | **1N5819**, stripe → board | **5V** |
-| 2 | Data Request (must be high) | | **5V** |
-| 3 | Data GND | | **G** |
+| 1 | +5 V (DSMR 5 only; 0 V on DSMR 4) | **1N5819**, stripe → board | 5V |
+| 2 | Data Request (must be high) | | 5V |
+| 3 | Data GND | | G |
 | 4 | not used | | cut short, insulate |
 | 5 | Data (inverted, open collector) | | **4** (GPIO4) |
-| 6 | Power GND | | **G** |
+| 6 | Power GND | | G |
 | | **2.2 kΩ pull-up** | | **3.3 ↔ 4** (neighbouring pads) |
 
 Belgian meters behave like DSMR 5 throughout this guide: 5 V on pin 1 and a telegram
@@ -68,7 +68,7 @@ multimeter in beep mode, find which loose wire belongs to each contact.
 
 ### Step 2 (optional): Measure at the meter
 Plug into the meter with the loose ends apart. DC volts:
-- pin 1 vs pin 6: **0 V** on DSMR 4, ~5 V on DSMR 5.
+- pin 1 vs pin 6: 0 V on DSMR 4, ~5 V on DSMR 5.
 - pin 5 vs pin 3: ~0 V (normal without pull-up).
 
 Unplug before soldering.
@@ -93,7 +93,7 @@ See the wiring diagram at the top of this page.
 ### Step 6: Check before power-up (nothing plugged in)
 | Measure | Expected |
 |---|---|
-| 3.3 ↔ 4 | **≈ 2.2 kΩ** |
+| 3.3 ↔ 4 | ≈ 2.2 kΩ |
 | 5V ↔ G | no beep |
 | 3.3 ↔ G | no beep |
 | 4 ↔ 5V | no beep |
@@ -111,7 +111,7 @@ Flash the latest release from your browser, or build your own; see the
 1. Plug the RJ12 into the P1 socket (E350: under the "P1 ▼" flap, from below).
 2. Power the board from a USB charger and set up WiFi from your phone (see
    [Using Piepr](../README.md#using-piepr)).
-3. Telegrams arrive **every 10 s** (DSMR 4) or every second (DSMR 5). Gas updates
+3. Telegrams arrive every 10 s (DSMR 4) or every second (DSMR 5). Gas updates
    hourly; *returned energy* stays 0 without solar panels.
 
 ### Changing WiFi later
