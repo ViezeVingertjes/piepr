@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- A single WiFi attempt that fails and is followed by a connection is no longer logged
+  as a warning
+
 ## 1.2.0 - 2026-11-27
 
 - A link at the top of the setup page switches between Dutch and English

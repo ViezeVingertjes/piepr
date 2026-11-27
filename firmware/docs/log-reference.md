@@ -20,7 +20,8 @@ chip itself.
 | `wifi_creds: no WiFi configured` | going to setup mode |
 | `net: connecting to "…"` | first attempt after start-up |
 | `net: connected, ip=…, signal N dBm` | online |
-| `net: disconnected (reason N: …); retrying in N s` | an attempt failed or the connection was lost, with the reason in words where there is something to do about it (network not found; network found, but its security does not fit; sign-in failed: wrong password or weak signal; access point stopped answering). One such line followed by `connected` is normal on a weak signal. Retries after 1 s, growing to 30 s |
+| `net: not connected yet (reason N); retrying in N s` | one attempt that didn't get through; normal right after a reset, when the access point still holds the previous session |
+| `net: disconnected (reason N: …); retrying in N s` | the connection was lost, or a second attempt in a row failed, with the reason in words where there is something to do about it (network not found; network found, but its security does not fit; sign-in failed: wrong password or weak signal; access point stopped answering). Retries after 1 s, growing to 30 s |
 | `net: connect failed: …; retrying in N s` | attempt rejected before it started; retried |
 | `… ; no retry scheduled` at the end of either line | the retry could not be planned; Piepr restarts after 15 minutes offline |
 | `net: lost IP address, reconnecting` | DHCP lease lost |

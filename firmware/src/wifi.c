@@ -35,6 +35,8 @@ static atomic_bool s_connected = false;
 static atomic_bool s_ever_connected = false;
 /* Consecutive auth-type disconnects; reset by any other outcome. */
 static atomic_uint s_auth_failures;
+/* Attempts that failed in a row since the last connection (or since start-up). */
+static atomic_uint s_failed_attempts;
 static esp_timer_handle_t s_reconnect_timer;
 static _Atomic int64_t s_backoff_us = BACKOFF_MIN_US; /* event task + esp_timer task */
 
@@ -142,7 +144,11 @@ static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
         connect_or_retry();
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
         const wifi_event_sta_disconnected_t *d = data;
-        atomic_store(&s_connected, false);
+        bool was_connected = atomic_exchange(&s_connected, false);
+        unsigned failed = was_connected ? 0 : atomic_fetch_add(&s_failed_attempts, 1) + 1;
+        if (was_connected) {
+            atomic_store(&s_failed_attempts, 0);
+        }
         if (is_auth_failure(d->reason)) {
             atomic_fetch_add(&s_auth_failures, 1);
         } else {
@@ -150,14 +156,22 @@ static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
         }
         char retry[RETRY_TEXT_MAX];
         int retry_s = schedule_reconnect();
-        const char *why = reason_text(d->reason);
-        ESP_LOGW(TAG, "disconnected (reason %d%s%s)%s", d->reason, why != NULL ? ": " : "",
-                 why != NULL ? why : "", retry_text(retry_s, retry, sizeof(retry)));
+        if (failed == 1) {
+            /* One attempt that doesn't get through is normal, above all right after
+             * a reset, when the access point still holds the previous session. */
+            ESP_LOGI(TAG, "not connected yet (reason %d)%s", d->reason,
+                     retry_text(retry_s, retry, sizeof(retry)));
+        } else {
+            const char *why = reason_text(d->reason);
+            ESP_LOGW(TAG, "disconnected (reason %d%s%s)%s", d->reason, why != NULL ? ": " : "",
+                     why != NULL ? why : "", retry_text(retry_s, retry, sizeof(retry)));
+        }
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         const ip_event_got_ip_t *e = data;
         atomic_store(&s_connected, true);
         atomic_store(&s_ever_connected, true);
         atomic_store(&s_auth_failures, 0);
+        atomic_store(&s_failed_attempts, 0);
         atomic_store(&s_backoff_us, BACKOFF_MIN_US);
         int rssi;
         if (wifi_get_rssi(&rssi)) {
