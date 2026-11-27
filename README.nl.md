@@ -71,8 +71,8 @@ meter? Maak een [metermelding](https://github.com/ViezeVingertjes/piepr/issues/n
 ## Zelf bouwen
 
 1. Hardware: onderdelenlijst (ongeveer €16), bedrading en controles in de [bouwgids](hardware/README.nl.md).
-2. Firmware: flash de [nieuwste release](https://github.com/ViezeVingertjes/piepr/releases/latest)
-   rechtstreeks vanuit je browser, of bouw hem zelf; zie de [firmwaregids](firmware/README.md) (Engels).
+2. Firmware: [installeer hem vanuit je browser](https://piepr.nl/installeren/), of bouw hem
+   zelf; zie de [firmwaregids](firmware/README.md) (Engels).
 
 | Map | Inhoud |
 |---|---|

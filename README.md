@@ -70,8 +70,8 @@ meter? Open a [meter report](https://github.com/ViezeVingertjes/piepr/issues/new
 ## Build your own
 
 1. Hardware: parts list (about €16), wiring and checks in the [build guide](hardware/README.md).
-2. Firmware: flash the [latest release](https://github.com/ViezeVingertjes/piepr/releases/latest)
-   straight from your browser, or build your own; see the [firmware guide](firmware/README.md).
+2. Firmware: [install it from your browser](https://piepr.nl/en/install/), or build your
+   own; see the [firmware guide](firmware/README.md).
 
 | Folder | Contents |
 |---|---|

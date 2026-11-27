@@ -114,7 +114,7 @@ Zie het bedradingsschema bovenaan deze pagina.
 | stekkerpin 1 → 5V (diodestand, rode meetpen op pin 1) | ~0,2–0,3 V; andersom: OL |
 
 ### Stap 7: Flash de firmware voordat je de meter aansluit
-Flash de nieuwste release vanuit je browser, of bouw hem zelf; zie de
+[Installeer de firmware vanuit je browser](https://piepr.nl/installeren/), of bouw hem zelf; zie de
 [firmwaregids](../firmware/README.md) (Engels). Zonder meter staat er elke minuut
 `p1: last 60s: ok 0 …` in het log; dat klopt.
 

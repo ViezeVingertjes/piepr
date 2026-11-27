@@ -10,13 +10,15 @@ telegrams raw on **TCP port 8088** (up to 5 readers; a 6th replaces the one conn
 - Hardware: see the [build guide](../hardware/README.md).
 
 ## Flash a release (nothing to install)
-1. Download the `.bin` file from the [latest release](https://github.com/ViezeVingertjes/piepr/releases/latest).
-2. Open [Espressif's web flasher](https://espressif.github.io/esptool-js/) in Chrome or
-   Edge, plug in the board, click **Connect** and pick its port. Not listed? Hold
-   BOOT while plugging it in.
-3. Set the flash address to `0x0`, choose the file and click **Program**.
+Open [piepr.nl/en/install](https://piepr.nl/en/install/) in Chrome or Edge on a
+computer, plug in the board with a USB cable that carries data, click **Install Piepr**
+and pick the board's port. Not listed? Hold BOOT while plugging it in.
 
-Or from a terminal: `esptool.py --chip esp32c3 write_flash 0x0 piepr-<version>.bin`.
+By hand: download the `.bin` file from the
+[latest release](https://github.com/ViezeVingertjes/piepr/releases/latest) and write it
+at address `0x0`, for example with
+`esptool.py --chip esp32c3 write_flash 0x0 piepr-<version>.bin`.
+
 The release uses setup password **piepr1234**; for your own, build it yourself.
 Flashing a release also clears the saved WiFi network: set it up again from your phone.
 

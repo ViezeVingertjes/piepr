@@ -1,7 +1,7 @@
 # Log reference
 
-What Piepr prints on its USB serial port (`pio device monitor`, or the console of the
-web flasher), and what each line means.
+What Piepr prints on its USB serial port (`pio device monitor`, or *Logs & Console* on
+the [install page](https://piepr.nl/en/install/)), and what each line means.
 
 | Message | Meaning |
 |---|---|

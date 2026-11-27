@@ -107,7 +107,7 @@ See the wiring diagram at the top of this page.
 | plug pin 1 → 5V (diode mode, red probe on pin 1) | ~0.2–0.3 V; reversed: OL |
 
 ### Step 7: Flash the firmware before connecting to the meter
-Flash the latest release from your browser, or build your own; see the
+[Install the firmware from your browser](https://piepr.nl/en/install/), or build your own; see the
 [firmware guide](../firmware/README.md). Without a meter the log shows
 `p1: last 60s: ok 0 …` every minute; that's expected.
 
