@@ -1,9 +1,14 @@
 # Changelog
 
-## Unreleased
+## 1.2.1 - 2026-11-27
 
+- Switching language on the setup page keeps the step you were on, the network list
+  and what you typed, instead of starting over with a new scan
 - A single WiFi attempt that fails and is followed by a connection is no longer logged
   as a warning
+- The Dutch README and build guide have their banner and drawings in Dutch
+- Installing 1.2.1 goes over USB, from [piepr.nl/installeren](https://piepr.nl/installeren/)
+  or by hand, and clears the saved WiFi network: set it up again from your phone
 
 ## 1.2.0 - 2026-11-27
 
