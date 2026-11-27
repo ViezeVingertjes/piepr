@@ -55,6 +55,18 @@ To change the WiFi later, hold the **BOOT** button until the light double-blinks
 | Your network isn't listed | it must be 2.4 GHz with a good signal; move the router or an extender closer, or use *Other network…* |
 | `piepr.local` doesn't work | find `piepr` in your router's device list and use its IP address |
 
+## Meters
+
+| Meter | P1 version | |
+|---|---|---|
+| Dutch smart meters | DSMR 4.x, 5.x | supported |
+| Belgian digital meters (Fluvius) | e-MUCS P1 | supported; switch the user ports on first at [mijn.fluvius.be/poortbeheer](https://mijn.fluvius.be/poortbeheer) |
+| Older Dutch meters | DSMR 2.2, 3 | not supported (9600 baud, no checksum) |
+| Luxembourg (Smarty) | | not supported (encrypted) |
+
+Piepr is developed on a Landis+Gyr E350 (DSMR 4.0). Something not working on your
+meter? Open a [meter report](https://github.com/ViezeVingertjes/piepr/issues/new?template=meter-report.yml).
+
 ## Build your own
 
 1. **Hardware:** parts list (about €16), wiring and checks in the [build guide](hardware/README.md).

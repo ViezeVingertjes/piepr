@@ -1,0 +1,31 @@
+name: Something doesn't work
+description: Piepr doesn't read the meter, drops off WiFi, won't set up, or the build fails
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Firmware version
+      description: 'The release you flashed, or the version in the log line that starts with "main: piepr".'
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: input
+    id: meter
+    attributes:
+      label: Meter
+      description: Make and model, and the DSMR version printed on it if there is one.
+      placeholder: Landis+Gyr E350, DSMR 4.0
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you did, what you expected and what the light does (on, slow blink, double blink).
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: If you can, a minute of log from "pio device monitor" or the console of the web flasher.
+      render: text

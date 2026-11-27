@@ -6,8 +6,7 @@ telegrams raw on **TCP port 8088** (up to **5 readers**; a 6th replaces the one 
 
 - **Stack:** ESP-IDF 6.1.1 via PlatformIO (`espressif32 @ 8.0.0`), C. Only extra
   dependency: Espressif's `mdns` component.
-- **Meters:** DSMR 4.x and 5.x (NL); Belgian e-MUCS should work (untested). Not
-  supported: DSMR 2.2/3 (9600 baud, no CRC), encrypted meters (Luxembourg *Smarty*).
+- **Meters:** DSMR 4.x and 5.x, and Belgian e-MUCS P1; see the [meters table](../README.md#meters).
 - **Hardware:** see the [build guide](../hardware/README.md).
 
 ## Flash a release (nothing to install)

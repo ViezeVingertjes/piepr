@@ -46,6 +46,9 @@ Board top view, **USB-C up**: the right-hand row is
 | 6 | Power GND | | **G** |
 | | **2.2 kΩ pull-up** | | **3.3 ↔ 4** (neighbouring pads) |
 
+Belgian meters behave like DSMR 5 throughout this guide: 5 V on pin 1 and a telegram
+every second.
+
 Don't use GPIO2, GPIO8 or GPIO9 (strapping pins; GPIO8 is the LED, GPIO9 BOOT).
 
 ---

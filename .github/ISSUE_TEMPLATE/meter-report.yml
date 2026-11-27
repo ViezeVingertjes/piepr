@@ -1,0 +1,47 @@
+name: Meter report
+description: Tell which meter you use Piepr on, working or not
+labels: [meter]
+body:
+  - type: input
+    id: meter
+    attributes:
+      label: Meter
+      description: Make and model, as printed on the front.
+      placeholder: Landis+Gyr E350
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: P1 version
+      options:
+        - DSMR 4
+        - DSMR 5
+        - Belgian (e-MUCS)
+        - Other or not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: works
+    attributes:
+      label: Does it work?
+      options:
+        - "Yes"
+        - Partly
+        - "No"
+    validations:
+      required: true
+  - type: input
+    id: header
+    attributes:
+      label: First line of a telegram
+      description: The line starting with "/", from "nc piepr.local 8088". It names the meter type and holds nothing personal.
+      placeholder: /XMX5LGBBFG1009394887
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: >
+        If you paste a whole telegram, first remove every line with 96.1.0 or
+        96.1.1 in it (such as 0-0:96.1.1, 0-1:96.1.0 and 0-1:96.1.1): those are
+        the serial numbers of your meters.
