@@ -12,7 +12,9 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:30rem;margin:0 auto;padding:1.25rem 1rem 2rem}
-.brand{display:block;height:1.5rem;width:auto;margin:0 0 1rem}
+.top{display:flex;align-items:center;justify-content:space-between;margin:0 0 1rem}
+.brand{display:block;height:1.5rem;width:auto}
+.lang{color:var(--muted);font-size:.9rem;padding:.5rem 0 .5rem .75rem}
 h1{font-size:1.75rem;line-height:1.15;letter-spacing:-.02em;margin:0 0 1rem}
 h2{font-size:1.2rem;margin:0 0 .25rem}
 h2:focus{outline:none}
@@ -60,11 +62,11 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
 </head>
 <body>
 <main>
-<svg class="brand" viewBox="0 -2 215 90" role="img" aria-label="Piepr"><path fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" d="M5.5 82V40M45.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M63 26V60M78 40H118A20 20 0 1 0 112.1 54.1M133.5 82V40M173.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M188.5 60V40A20 20 0 0 1 208.5 20"/><circle cx="63" cy="6" r="7" fill="#ff4b3e"/></svg>
+<div class="top"><svg class="brand" viewBox="0 -2 215 90" role="img" aria-label="Piepr"><path fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" d="M5.5 82V40M45.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M63 26V60M78 40H118A20 20 0 1 0 112.1 54.1M133.5 82V40M173.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M188.5 60V40A20 20 0 0 1 208.5 20"/><circle cx="63" cy="6" r="7" fill="#ff4b3e"/></svg><a class="lang" href="/?lang=[[nl]]" lang="[[nl]]">[[Nederlands]]</a></div>
 <h1>[[Connect Piepr to WiFi]]</h1>
 <div class="meter js-only" aria-hidden="true"><i></i><i></i><i></i></div>
 <p class="banner" id="banner" role="alert" hidden></p>
-<form method="post" action="/save" id="form" novalidate>
+<form method="post" action="/save?lang=[[en]]" id="form" novalidate>
 <section id="step-network">
   <div class="head"><h2 tabindex="-1">[[Choose your network]]</h2><button type="button" class="rescan js-only" id="rescan" aria-label="[[Scan again]]"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8.7"/><path d="M20 3.7v5h-5"/></svg></button></div>
   <p class="hint js-only" id="scan-status" role="status"></p>
@@ -275,7 +277,7 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
     var save = $("save");
     function fail(msg) { save.disabled = false; setError(null, "save-error", msg); }
     save.disabled = true;
-    fetch("/save", { method: "POST", body: new URLSearchParams(new FormData($("form"))) })
+    fetch($("form").action, { method: "POST", body: new URLSearchParams(new FormData($("form"))) })
       .then(function (r) {
         if (r.ok) { $("done-ssid").textContent = ssid.value; show("step-done"); return; }
         fail(r.status === 400 ? "[[Name or password not accepted.]]" : "[[Saving failed. Try again.]]");

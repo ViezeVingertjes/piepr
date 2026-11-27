@@ -93,6 +93,44 @@ void test_length_is_respected(void)
     TEST_ASSERT_FALSE(lang_prefers_dutch("nl", 0));
 }
 
+static lang_choice_t asked(const char *query)
+{
+    return lang_from_query(query, strlen(query));
+}
+
+void test_query_names_the_language(void)
+{
+    TEST_ASSERT_EQUAL(LANG_DUTCH, asked("lang=nl"));
+    TEST_ASSERT_EQUAL(LANG_ENGLISH, asked("lang=en"));
+    TEST_ASSERT_EQUAL(LANG_DUTCH, asked("a=1&lang=nl"));
+    TEST_ASSERT_EQUAL(LANG_ENGLISH, asked("lang=en&b=2"));
+}
+
+void test_query_without_a_known_language(void)
+{
+    TEST_ASSERT_EQUAL(LANG_UNSET, lang_from_query(NULL, 0));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked(""));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked("lang="));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked("lang=fr"));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked("lang=nlx"));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked("lang=NL"));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked("xlang=nl"));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked("language=nl"));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked("nl"));
+}
+
+void test_query_first_one_counts(void)
+{
+    TEST_ASSERT_EQUAL(LANG_DUTCH, asked("lang=nl&lang=en"));
+    TEST_ASSERT_EQUAL(LANG_UNSET, asked("lang=fr&lang=nl"));
+}
+
+void test_query_length_is_respected(void)
+{
+    TEST_ASSERT_EQUAL(LANG_UNSET, lang_from_query("lang=nl", 6));
+    TEST_ASSERT_EQUAL(LANG_DUTCH, lang_from_query("lang=nl&lang=en", 7));
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -107,5 +145,9 @@ int main(void)
     RUN_TEST(test_bad_weights_are_ignored);
     RUN_TEST(test_cut_off_header);
     RUN_TEST(test_length_is_respected);
+    RUN_TEST(test_query_names_the_language);
+    RUN_TEST(test_query_without_a_known_language);
+    RUN_TEST(test_query_first_one_counts);
+    RUN_TEST(test_query_length_is_respected);
     return UNITY_END();
 }

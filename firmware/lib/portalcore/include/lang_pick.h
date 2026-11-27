@@ -13,3 +13,14 @@
  * False when Dutch is not asked for, and for anything that can't be parsed:
  * English is the fallback. */
 bool lang_prefers_dutch(const char *accept_language, size_t len);
+
+typedef enum {
+    LANG_UNSET,
+    LANG_ENGLISH,
+    LANG_DUTCH,
+} lang_choice_t;
+
+/* The language a URL query asks for with "lang=nl" or "lang=en" (`len` bytes,
+ * without the '?', e.g. "lang=nl" or "a=1&lang=en"). LANG_UNSET when there is
+ * no such parameter or it names another language; the first one counts. */
+lang_choice_t lang_from_query(const char *query, size_t len);

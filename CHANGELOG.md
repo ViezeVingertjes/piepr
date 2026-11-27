@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- A link at the top of the setup page switches between Dutch and English
+
 ## 1.1.0 - 2026-11-27
 
 - The setup page is in Dutch on a phone set to Dutch, and in English otherwise

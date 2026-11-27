@@ -126,3 +126,37 @@ bool lang_prefers_dutch(const char *accept_language, size_t len)
     }
     return dutch > english || (dutch == english && dutch_at < english_at);
 }
+
+lang_choice_t lang_from_query(const char *query, size_t len)
+{
+    static const char KEY[] = "lang=";
+    const size_t key_len = sizeof(KEY) - 1;
+
+    for (size_t start = 0; query != NULL && start < len;) {
+        size_t end = start;
+        while (end < len && query[end] != '&') {
+            end++;
+        }
+        const char *param = query + start;
+        size_t param_len = end - start;
+        bool is_lang = param_len >= key_len;
+        for (size_t i = 0; is_lang && i < key_len; i++) {
+            is_lang = param[i] == KEY[i];
+        }
+        if (is_lang) {
+            const char *value = param + key_len;
+            if (param_len - key_len != 2) {
+                return LANG_UNSET;
+            }
+            if (value[0] == 'n' && value[1] == 'l') {
+                return LANG_DUTCH;
+            }
+            if (value[0] == 'e' && value[1] == 'n') {
+                return LANG_ENGLISH;
+            }
+            return LANG_UNSET;
+        }
+        start = end + 1;
+    }
+    return LANG_UNSET;
+}

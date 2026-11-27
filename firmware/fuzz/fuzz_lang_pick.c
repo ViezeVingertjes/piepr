@@ -1,4 +1,5 @@
-/* libFuzzer harness: arbitrary Accept-Language headers into lang_prefers_dutch.
+/* libFuzzer harness: arbitrary Accept-Language headers into lang_prefers_dutch,
+ * and the same bytes as a URL query into lang_from_query.
  * Run: fuzz/run.sh lang_pick */
 #include <assert.h>
 #include <stdbool.h>
@@ -30,6 +31,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     assert(!dutch || mentions_dutch(data, size));
     /* A list that ends in a comma means the same. */
     assert(size == 0 || data[size - 1] != ',' || dutch == lang_prefers_dutch(header, size - 1));
+
+    lang_choice_t asked = lang_from_query(header, size);
+    assert(asked == LANG_UNSET || size >= sizeof("lang=nl") - 1);
 
     free(header);
     return 0;

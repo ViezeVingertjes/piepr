@@ -37,6 +37,7 @@
 #define RESTART_AFTER_SAVE_MS 1000
 #define TIMEOUT_CHECK_MS      1000
 #define ACCEPT_LANGUAGE_MAX   96 /* the start of the header is what decides */
+#define LANG_QUERY_MAX        16 /* "lang=nl"; a longer query is none of ours */
 
 static const char *TAG = "setup";
 
@@ -127,9 +128,17 @@ static esp_err_t send_response(httpd_req_t *req, const char *status, const char 
     return httpd_resp_send(req, body, (ssize_t)len);
 }
 
-/* Dutch for a browser that asks for it (Accept-Language), English otherwise. */
+/* The language chosen with the link on the page ("?lang=nl") wins; without one,
+ * Dutch for a browser that asks for it (Accept-Language) and English otherwise. */
 static bool wants_dutch(httpd_req_t *req)
 {
+    char query[LANG_QUERY_MAX] = { 0 };
+    if (httpd_req_get_url_query_str(req, query, sizeof(query)) == ESP_OK) {
+        lang_choice_t chosen = lang_from_query(query, strnlen(query, sizeof(query)));
+        if (chosen != LANG_UNSET) {
+            return chosen == LANG_DUTCH;
+        }
+    }
     char header[ACCEPT_LANGUAGE_MAX] = { 0 };
     esp_err_t err = httpd_req_get_hdr_value_str(req, "Accept-Language", header, sizeof(header));
     if (err != ESP_OK && err != ESP_ERR_HTTPD_RESULT_TRUNC) {

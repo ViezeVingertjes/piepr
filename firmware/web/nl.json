@@ -47,5 +47,7 @@
   "Piepr: not saved": "Piepr: niet opgeslagen",
   "Not saved": "Niet opgeslagen",
   "Name: 1&ndash;32 characters. Password: 8&ndash;63 characters, or empty for an open network.": "Naam: 1&ndash;32 tekens. Wachtwoord: 8&ndash;63 tekens, of leeg bij een open netwerk.",
-  "Back to setup": "Terug naar instellen"
+  "Back to setup": "Terug naar instellen",
+  "nl": "en",
+  "Nederlands": "English"
 }
