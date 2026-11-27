@@ -20,12 +20,13 @@ chip itself.
 | `wifi_creds: no WiFi configured` | going to setup mode |
 | `net: connecting to "…"` | first attempt after start-up |
 | `net: connected, ip=…, signal N dBm` | online |
-| `net: disconnected (reason N: …); retrying in N s` | an attempt failed or the connection was lost, with the reason in words where there is something to do about it (network not found; sign-in failed: wrong password or weak signal; access point stopped answering). One such line followed by `connected` is normal on a weak signal. Retries after 1 s, growing to 30 s |
+| `net: disconnected (reason N: …); retrying in N s` | an attempt failed or the connection was lost, with the reason in words where there is something to do about it (network not found; network found, but its security does not fit; sign-in failed: wrong password or weak signal; access point stopped answering). One such line followed by `connected` is normal on a weak signal. Retries after 1 s, growing to 30 s |
 | `net: connect failed: …; retrying in N s` | attempt rejected before it started; retried |
+| `… ; no retry scheduled` at the end of either line | the retry could not be planned; Piepr restarts after 15 minutes offline |
 | `net: lost IP address, reconnecting` | DHCP lease lost |
 | `setup: restarting into setup mode` | entering setup (button or recovery) |
 | `setup: access point "Piepr-Setup" on channel C, open http://192.168.4.1/` | setup ready |
-| `setup: a device joined the hotspot (n connected)` / `left the hotspot` | your phone joined or left Piepr-Setup |
+| `setup: a device joined the hotspot` / `left the hotspot` | your phone joined or left Piepr-Setup |
 | `net: N networks nearby, M listed` | scan for the setup page done |
 | `setup: saved WiFi settings for "…", restarting` | saved |
 | `setup: setup timeout, restarting` | no page activity for 10 min (5 after recovery); only with a known network |

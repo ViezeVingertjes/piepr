@@ -138,6 +138,7 @@ static const char *start_reason(esp_reset_reason_t reason, bool *trouble)
     *trouble = false;
     switch (reason) {
     case ESP_RST_PANIC:
+    case ESP_RST_CPU_LOCKUP:
         *trouble = true;
         return "a crash";
     case ESP_RST_INT_WDT:
@@ -146,8 +147,12 @@ static const char *start_reason(esp_reset_reason_t reason, bool *trouble)
         *trouble = true;
         return "a hang (watchdog)";
     case ESP_RST_BROWNOUT:
+    case ESP_RST_PWR_GLITCH:
         *trouble = true;
         return "a power dip";
+    case ESP_RST_EFUSE:
+        *trouble = true;
+        return "a chip settings error";
     case ESP_RST_POWERON:
         return "power-on";
     case ESP_RST_SW:

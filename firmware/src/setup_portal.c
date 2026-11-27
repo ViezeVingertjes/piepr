@@ -318,12 +318,10 @@ static void on_hotspot_event(void *arg, esp_event_base_t base, int32_t id, void 
     (void)arg;
     (void)base;
     (void)data;
-    static int joined;
     if (id == WIFI_EVENT_AP_STACONNECTED) {
-        ESP_LOGI(TAG, "a device joined the hotspot (%d connected)", ++joined);
+        ESP_LOGI(TAG, "a device joined the hotspot");
     } else if (id == WIFI_EVENT_AP_STADISCONNECTED) {
-        joined = joined > 0 ? joined - 1 : 0;
-        ESP_LOGI(TAG, "a device left the hotspot (%d connected)", joined);
+        ESP_LOGI(TAG, "a device left the hotspot");
     }
 }
 

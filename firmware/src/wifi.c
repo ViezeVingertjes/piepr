@@ -1,6 +1,7 @@
 #include "wifi.h"
 
 #include <stdatomic.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -25,7 +26,8 @@ _Static_assert(sizeof(SETUP_PASS) - 1 >= WIFI_PASS_MIN_LEN &&
 #define BACKOFF_MAX_US (30 * US_PER_S)
 #define SCAN_ATTEMPTS  5
 #define SCAN_RETRY_MS  1000 /* the driver refuses a scan while it is busy */
-#define SCAN_ROUNDS    3    /* averaged: one weak moment doesn't decide the order */
+#define RETRY_TEXT_MAX 32
+#define SCAN_ROUNDS    3 /* averaged: one weak moment doesn't decide the order */
 
 static const char *TAG = LOG_TAG_NET;
 
@@ -36,7 +38,10 @@ static atomic_uint s_auth_failures;
 static esp_timer_handle_t s_reconnect_timer;
 static _Atomic int64_t s_backoff_us = BACKOFF_MIN_US; /* event task + esp_timer task */
 
-/* Returns the seconds until the next attempt, for the caller's log line. */
+#define NO_RETRY (-1)
+
+/* Returns the seconds until the next attempt, for the caller's log line, or
+ * NO_RETRY when none could be scheduled. */
 static int schedule_reconnect(void)
 {
     int64_t delay = atomic_load(&s_backoff_us);
@@ -47,8 +52,19 @@ static int schedule_reconnect(void)
     if (err != ESP_OK) {
         /* The supervisor restarts the device if WiFi stays down. */
         ESP_LOGE(TAG, "reconnect timer failed: %s", esp_err_to_name(err));
+        return NO_RETRY;
     }
     return (int)(delay / US_PER_S);
+}
+
+/* "; retrying in 4 s" for the end of a log line, or that there is no retry. */
+static const char *retry_text(int retry_s, char *buf, size_t size)
+{
+    if (retry_s == NO_RETRY) {
+        return "; no retry scheduled";
+    }
+    snprintf(buf, size, "; retrying in %d s", retry_s);
+    return buf;
 }
 
 /* A rejected attempt produces no DISCONNECTED event: without this retry the
@@ -57,8 +73,10 @@ static void connect_or_retry(void)
 {
     esp_err_t err = esp_wifi_connect();
     if (err != ESP_OK) {
+        char retry[RETRY_TEXT_MAX];
         int retry_s = schedule_reconnect();
-        ESP_LOGW(TAG, "connect failed: %s; retrying in %d s", esp_err_to_name(err), retry_s);
+        ESP_LOGW(TAG, "connect failed: %s%s", esp_err_to_name(err),
+                 retry_text(retry_s, retry, sizeof(retry)));
     }
 }
 
@@ -91,6 +109,11 @@ static const char *reason_text(uint8_t reason)
     switch (reason) {
     case WIFI_REASON_NO_AP_FOUND:
         return "network not found";
+    case WIFI_REASON_NO_AP_FOUND_W_COMPATIBLE_SECURITY:
+    case WIFI_REASON_NO_AP_FOUND_IN_AUTHMODE_THRESHOLD:
+        return "network found, but its security does not fit";
+    case WIFI_REASON_NO_AP_FOUND_IN_RSSI_THRESHOLD:
+        return "network found, but too weak";
     /* A weak link fails the same way as a wrong password does, also on a
      * single attempt that the next one makes good. */
     case WIFI_REASON_AUTH_FAIL:
@@ -125,19 +148,23 @@ static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
         } else {
             atomic_store(&s_auth_failures, 0);
         }
+        char retry[RETRY_TEXT_MAX];
         int retry_s = schedule_reconnect();
         const char *why = reason_text(d->reason);
-        ESP_LOGW(TAG, "disconnected (reason %d%s%s); retrying in %d s", d->reason,
-                 why != NULL ? ": " : "", why != NULL ? why : "", retry_s);
+        ESP_LOGW(TAG, "disconnected (reason %d%s%s)%s", d->reason, why != NULL ? ": " : "",
+                 why != NULL ? why : "", retry_text(retry_s, retry, sizeof(retry)));
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         const ip_event_got_ip_t *e = data;
         atomic_store(&s_connected, true);
         atomic_store(&s_ever_connected, true);
         atomic_store(&s_auth_failures, 0);
         atomic_store(&s_backoff_us, BACKOFF_MIN_US);
-        int rssi = 0;
-        wifi_get_rssi(&rssi);
-        ESP_LOGI(TAG, "connected, ip=" IPSTR ", signal %d dBm", IP2STR(&e->ip_info.ip), rssi);
+        int rssi;
+        if (wifi_get_rssi(&rssi)) {
+            ESP_LOGI(TAG, "connected, ip=" IPSTR ", signal %d dBm", IP2STR(&e->ip_info.ip), rssi);
+        } else {
+            ESP_LOGI(TAG, "connected, ip=" IPSTR, IP2STR(&e->ip_info.ip));
+        }
     } else if (base == IP_EVENT && id == IP_EVENT_STA_LOST_IP) {
         atomic_store(&s_connected, false);
         ESP_LOGW(TAG, "lost IP address, reconnecting");
