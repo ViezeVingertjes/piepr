@@ -52,7 +52,8 @@ you save one. To change the network later: **hold BOOT until the LED double-blin
 3. Enter the password (shown while typing; skipped for open networks).
 4. Save. The device restarts and joins.
 
-The page is in Dutch on a phone set to Dutch and in English otherwise. It works
+The page is in Dutch on a phone set to Dutch and in English otherwise; a link at the
+top switches between the two. It works
 offline (gzipped in flash, about 5 KB per language). Name 1–32 bytes, password
 empty or 8–63 bytes; checked on the page and again on the device. Without
 JavaScript, or on old browsers, it falls back to a plain form.

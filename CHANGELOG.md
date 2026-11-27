@@ -1,11 +1,13 @@
 # Changelog
 
-## Unreleased
+## 1.2.0 - 2026-11-27
 
 - A link at the top of the setup page switches between Dutch and English
-- A shorter, clearer log: only Piepr's own lines, the reason for a start-up or a lost
-  WiFi connection in words, a line when telegrams start arriving and when a phone joins
-  the setup hotspot. The WiFi lines are now tagged `net:`
+- A shorter, clearer log: only Piepr's own lines, with the reason for a start-up or a
+  lost WiFi connection in words, a line when telegrams start arriving and when a
+  device joins the setup hotspot. The WiFi lines are now tagged `net:`
+- Installing 1.2.0 goes over USB, from [piepr.nl/installeren](https://piepr.nl/installeren/)
+  or by hand, and clears the saved WiFi network: set it up again from your phone
 
 ## 1.1.0 - 2026-11-27
 
