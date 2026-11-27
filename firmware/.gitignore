@@ -1,0 +1,9 @@
+secrets.ini
+.pio/
+sdkconfig.*
+!sdkconfig.defaults
+managed_components/
+src/secrets_gen.h
+src/version_gen.h
+web/gz/
+.vscode/

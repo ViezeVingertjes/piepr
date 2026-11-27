@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Piepr: WiFi setup</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23ffc21a'/%3E%3Cpath d='M20 52V28M45 28a12.5 12.5 0 1 1-25 0a12.5 12.5 0 1 1 25 0' fill='none' stroke='%230e2236' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='49' cy='13' r='5' fill='%23ff4b3e'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#e9eef3;--card:#fff;--ink:#0e2236;--muted:#55657a;--line:#d3dbe3;--act:#0e2236;--on-act:#fff;--sel:#ffc21a;--err:#b3261e;--warn:#fff3c4}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1a2a;--card:#12263b;--ink:#e9eef3;--muted:#93a3b5;--line:#22394f;--act:#ffc21a;--on-act:#0e2236;--err:#ff8a80;--warn:#3a3112}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:30rem;margin:0 auto;padding:1.25rem 1rem 2rem}
+.brand{display:block;height:1.5rem;width:auto;margin:0 0 1rem}
+h1{font-size:1.75rem;line-height:1.15;letter-spacing:-.02em;margin:0 0 1rem}
+h2{font-size:1.2rem;margin:0 0 .25rem}
+h2:focus{outline:none}
+p{margin:.25rem 0 1rem}
+.muted{color:var(--muted)}
+.meter{display:flex;gap:.35rem;margin-bottom:1.25rem}
+.meter i{flex:1;height:.4rem;border-radius:.2rem;background:var(--line)}
+.meter i.on{background:var(--sel)}
+.banner{background:var(--warn);border-left:.25rem solid var(--sel);border-radius:.5rem;padding:.75rem .75rem .75rem calc(.75rem + 1px);margin:0 0 1.25rem}
+.list{list-style:none;margin:0 0 .5rem;padding:0;background:var(--card);border:1px solid var(--line);border-radius:.75rem;overflow:hidden}
+.list li+li{border-top:1px solid var(--line)}
+.net{display:flex;align-items:center;gap:.75rem;width:100%;min-height:3.25rem;padding:.75rem 1rem;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.net:focus-visible{outline:3px solid var(--act);outline-offset:-3px}
+.net[aria-current]{box-shadow:inset .25rem 0 var(--sel)}
+.name{flex:1;overflow-wrap:anywhere}
+.bars{display:inline-flex;align-items:flex-end;gap:2px;height:16px}
+.bars b{width:4px;background:var(--line);border-radius:1px}
+.bars b:nth-child(1){height:25%}.bars b:nth-child(2){height:50%}.bars b:nth-child(3){height:75%}.bars b:nth-child(4){height:100%}
+.bars b.on{background:var(--ink)}
+.lock{width:14px;height:14px;fill:var(--muted)}
+#other{margin-top:1rem}
+.head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.5rem}
+.head h2{margin:0}
+.rescan{width:2.75rem;height:2.75rem;margin-right:-.6rem;padding:0;display:flex;align-items:center;justify-content:center;background:none;color:var(--act);border:0;border-radius:50%;cursor:pointer}
+.rescan:disabled{cursor:default}
+.rescan svg{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+@media (prefers-reduced-motion:no-preference){.rescan[aria-busy=true] svg{animation:spin 1s linear infinite}}
+@keyframes spin{to{transform:rotate(360deg)}}
+label{display:block;font-weight:600;margin:0 0 .5rem}
+input{display:block;width:100%;margin:0 0 .5rem;font:inherit;font-size:max(16px,1rem);padding:.75rem 1rem;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:.5rem}
+input:focus{outline:3px solid var(--act);outline-offset:0;border-color:transparent}
+input[aria-invalid=true]{border-color:var(--err)}
+.hint{font-size:.9rem;color:var(--muted);margin:0 0 .5rem}
+.error{color:var(--err);font-size:.9rem;margin:0 0 .5rem}
+.hint:empty,.error:empty{display:none}
+.primary,.secondary{display:block;width:100%;min-height:2.9rem;margin:1rem 0 0;padding:.75rem 1rem;font:inherit;font-weight:600;border-radius:.5rem;cursor:pointer}
+.primary{background:var(--act);color:var(--on-act);border:0}
+.secondary{background:none;color:var(--act);border:1px solid var(--line);margin-top:.75rem}
+button:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
+dl{background:var(--card);border:1px solid var(--line);border-radius:.75rem;padding:.25rem 1rem;margin:.5rem 0}
+dt{color:var(--muted);font-size:.9rem;margin-top:.5rem}
+dd{margin:0 0 .5rem;font-weight:600;overflow-wrap:anywhere}
+html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
+</style>
+</head>
+<body>
+<main>
+<svg class="brand" viewBox="0 -2 215 90" role="img" aria-label="Piepr"><path fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" d="M5.5 82V40M45.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M63 26V60M78 40H118A20 20 0 1 0 112.1 54.1M133.5 82V40M173.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M188.5 60V40A20 20 0 0 1 208.5 20"/><circle cx="63" cy="6" r="7" fill="#ff4b3e"/></svg>
+<h1>Connect Piepr to WiFi</h1>
+<div class="meter js-only" aria-hidden="true"><i></i><i></i><i></i></div>
+<p class="banner" id="banner" role="alert" hidden></p>
+<form method="post" action="/save" id="form" novalidate>
+<section id="step-network">
+  <div class="head"><h2 tabindex="-1">Choose your network</h2><button type="button" class="rescan js-only" id="rescan" aria-label="Scan again"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8.7"/><path d="M20 3.7v5h-5"/></svg></button></div>
+  <p class="hint js-only" id="scan-status" role="status"></p>
+  <ul class="list js-only" id="networks"></ul>
+  <p class="hint js-only">Only 2.4 GHz networks with a good signal are shown. Missing yours? Enable 2.4 GHz or move the router closer.</p>
+  <div id="other" class="no-js">
+    <label for="ssid">Network name</label>
+    <input id="ssid" name="ssid" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+    <p class="hint">2.4 GHz only.</p>
+    <p class="error" id="ssid-error" role="alert"></p>
+    <button type="button" class="primary js-only" id="other-next">Next</button>
+  </div>
+</section>
+<section id="step-password">
+  <h2 class="js-only" tabindex="-1">Enter the password</h2>
+  <p class="muted js-only" id="password-for"></p>
+  <label for="pass">Password</label>
+  <input id="pass" name="pass" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+  <p class="hint" id="pass-hint">Leave empty for an open network.</p>
+  <p class="error" id="pass-error" role="alert"></p>
+  <button type="button" class="primary js-only" id="pass-next">Next</button>
+  <button type="button" class="secondary js-only" id="pass-back">Back</button>
+</section>
+<section id="step-confirm">
+  <h2 class="js-only" tabindex="-1">Check and save</h2>
+  <dl class="js-only"><dt>Network</dt><dd id="sum-ssid"></dd><dt>Password</dt><dd id="sum-pass"></dd></dl>
+  <p class="error" id="save-error" role="alert"></p>
+  <button type="submit" class="primary" id="save">Save</button>
+  <button type="button" class="secondary js-only" id="confirm-back">Back</button>
+</section>
+<section id="step-done" class="js-only">
+  <h2 tabindex="-1">Saved</h2>
+  <p>Piepr is joining <strong id="done-ssid"></strong>. When its light stays on, it’s connected.</p>
+  <p class="muted">You can switch your phone back to your own WiFi. If Piepr can’t connect, Piepr-Setup returns in about 5 minutes.</p>
+  <p class="muted">Find it at <b>piepr.local</b>, port <b>8088</b>.</p>
+</section>
+</form>
+</main>
+<script>
+(function () {
+  "use strict";
+  /* Old browsers get the plain form, which works without script. */
+  if (!window.fetch || !window.TextEncoder || !window.URLSearchParams) { return; }
+  document.documentElement.classList.add("js");
+  var SSID_MAX = 32, PASS_MIN = 8, PASS_MAX = 63; /* bytes, as checked on the device */
+  var BAR_DBM = [-75, -67, -55];                  /* signal needed for bars 2, 3 and 4 */
+  var SCAN_POLL_MS = 1000, SCAN_POLLS = 60, KEEPALIVE_MS = 60000;
+  var $ = function (id) { return document.getElementById(id); };
+  var ssid = $("ssid"), pass = $("pass");
+  var steps = ["step-network", "step-password", "step-confirm", "step-done"];
+  var picked = null; /* the listed network chosen; null for "Other network…" */
+  var bytes = function (s) { return new TextEncoder().encode(s).length; };
+  /* Limits count bytes: say so when the text has letters that take more than one. */
+  var tooLong = function (s, max) {
+    return "Too long: max " + max + " characters" +
+      (bytes(s) !== s.length ? " (accents and emoji count extra)." : ".");
+  };
+  var current = function (id) { return $(id).classList.contains("current"); };
+  var openPick = function () { return picked !== null && !picked.secure; };
+
+  function show(id) {
+    var n = steps.indexOf(id);
+    steps.forEach(function (s) { $(s).classList.toggle("current", s === id); });
+    document.querySelectorAll(".meter i").forEach(function (seg, i) { seg.classList.toggle("on", i <= n); });
+    (id === "step-password" ? pass : $(id).querySelector("h2")).focus();
+    window.scrollTo(0, 0);
+  }
+
+  function setError(input, el, msg) {
+    $(el).textContent = msg;
+    if (input) { input.setAttribute("aria-invalid", String(!!msg)); }
+    return !msg;
+  }
+
+  function checkSsid() {
+    var n = bytes(ssid.value);
+    return setError(ssid, "ssid-error", n === 0 ? "Enter a network name." :
+      n > SSID_MAX ? tooLong(ssid.value, SSID_MAX) : "");
+  }
+
+  function checkPass() {
+    var n = bytes(pass.value), required = picked !== null && picked.secure;
+    return setError(pass, "pass-error", n > PASS_MAX ? tooLong(pass.value, PASS_MAX) :
+      (n > 0 || required) && n < PASS_MIN ? "At least " + PASS_MIN + " characters." : "");
+  }
+
+  function bars(rssi) {
+    var el = document.createElement("span"), level = 1;
+    BAR_DBM.forEach(function (dbm) { if (rssi >= dbm) { level++; } });
+    el.className = "bars";
+    el.setAttribute("role", "img");
+    el.setAttribute("aria-label", "Signal " + level + " of 4");
+    for (var i = 1; i <= 4; i++) {
+      el.appendChild(document.createElement("b")).className = i <= level ? "on" : "";
+    }
+    return el;
+  }
+
+  var LOCK = '<svg class="lock" viewBox="0 0 16 16" role="img" aria-label="Secured"><path d="M4 7V5a4 4 0 0 1 8 0v2h1v8H3V7h1zm2 0h4V5a2 2 0 0 0-4 0v2z"/></svg>';
+
+  function row(label, onPick, net) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "net";
+    btn.appendChild(document.createElement("span")).className = "name";
+    btn.firstChild.textContent = label;
+    if (net) {
+      if (net.secure) { btn.insertAdjacentHTML("beforeend", LOCK); }
+      btn.appendChild(bars(net.rssi));
+    }
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".net").forEach(function (b) { b.removeAttribute("aria-current"); });
+      btn.setAttribute("aria-current", "true");
+      onPick();
+    });
+    $("networks").appendChild(document.createElement("li")).appendChild(btn);
+  }
+
+  function list(nets) {
+    $("networks").textContent = "";
+    nets.forEach(function (net) { row(net.ssid, function () { pick(net); }, net); });
+    row("Other network…", pickOther, null);
+  }
+
+  /* A password belongs to one network: switching networks clears it. */
+  function pick(net) {
+    if (ssid.value !== net.ssid || !net.secure) { pass.value = ""; }
+    picked = net;
+    ssid.value = net.ssid;
+    $("other").classList.add("no-js");
+    if (openPick()) { confirm(); } else { askPass(); }
+  }
+
+  function pickOther() {
+    if (picked) { ssid.value = pass.value = ""; }
+    picked = null;
+    $("other").classList.remove("no-js");
+    ssid.focus();
+  }
+
+  function askPass() {
+    $("password-for").textContent = "For “" + ssid.value + "”.";
+    $("pass-hint").hidden = !!picked;
+    setError(pass, "pass-error", "");
+    show("step-password");
+  }
+
+  function confirm() {
+    $("sum-ssid").textContent = ssid.value;
+    $("sum-pass").textContent = pass.value || "None (open)";
+    setError(null, "save-error", "");
+    show("step-confirm");
+  }
+
+  var REASONS = {
+    no_connect: function (s) { return "Couldn’t connect to “" + s + "”. If your router was off, just close this page: Piepr retries within 5 minutes."; },
+    auth: function (s) { return "“" + s + "” rejected the password, or the signal is too weak. Pick it and try again."; }
+  };
+
+  function scanning(on, msg) {
+    $("rescan").disabled = on;
+    $("rescan").setAttribute("aria-busy", String(on));
+    $("scan-status").textContent = msg;
+  }
+
+  function rescan() {
+    var polls = 0;
+    function failed() { scanning(false, "Scan failed. Still on Piepr-Setup? Tap ↻ to retry."); }
+    /* A poll can drop while the hotspot is off-channel: retry until SCAN_POLLS. */
+    function poll() {
+      if (++polls > SCAN_POLLS) { failed(); return; }
+      setTimeout(function () { fetch("/api/state").then(check).catch(poll); }, SCAN_POLL_MS);
+    }
+    function check(r) {
+      if (!r.ok) { throw new Error(r.status); }
+      return r.json().then(function (state) {
+        if (REASONS[state.reason]) {
+          $("banner").textContent = REASONS[state.reason](state.reason_ssid);
+          $("banner").hidden = false;
+        }
+        if (!state.scanning) {
+          list(state.networks);
+          scanning(false, state.networks.length ? "" : "No networks with a good signal found.");
+          return;
+        }
+        poll();
+      });
+    }
+    scanning(true, "Looking for networks… (about 10 s)");
+    fetch("/api/scan", { method: "POST" }).then(check).catch(failed);
+  }
+
+  $("rescan").addEventListener("click", rescan);
+  $("other-next").addEventListener("click", function () { if (checkSsid()) { askPass(); } else { ssid.focus(); } });
+  $("pass-next").addEventListener("click", function () { if (checkPass()) { confirm(); } else { pass.focus(); } });
+  $("pass-back").addEventListener("click", function () { show("step-network"); });
+  $("confirm-back").addEventListener("click", function () { show(openPick() ? "step-network" : "step-password"); });
+  ssid.addEventListener("input", function () { if (ssid.getAttribute("aria-invalid") === "true") { checkSsid(); } });
+  pass.addEventListener("input", function () { if (pass.getAttribute("aria-invalid") === "true") { checkPass(); } });
+
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    /* Enter/Go on the keyboard means "Next" until the confirm step. */
+    if (!current("step-confirm")) {
+      $(current("step-password") ? "pass-next" : "other-next").click();
+      return;
+    }
+    var save = $("save");
+    function fail(msg) { save.disabled = false; setError(null, "save-error", msg); }
+    save.disabled = true;
+    fetch("/save", { method: "POST", body: new URLSearchParams(new FormData($("form"))) })
+      .then(function (r) {
+        if (r.ok) { $("done-ssid").textContent = ssid.value; show("step-done"); return; }
+        fail(r.status === 400 ? "Name or password not accepted." : "Saving failed. Try again.");
+      })
+      .catch(function () { fail("No reply. If Piepr’s light stays on, it’s saved; otherwise rejoin Piepr-Setup and try again."); });
+  });
+
+  show("step-network");
+  list([]);
+  rescan();
+  /* Page activity keeps the device's setup window open while someone types. */
+  setInterval(function () { fetch("/api/state").catch(function () {}); }, KEEPALIVE_MS);
+})();
+</script>
+</body>
+</html>

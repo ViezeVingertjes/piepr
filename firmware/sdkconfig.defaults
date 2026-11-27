@@ -1,0 +1,32 @@
+# ESP-IDF settings applied on top of the defaults. After changing this file do a
+# clean build: rm -rf .pio/build/supermini sdkconfig.supermini
+
+# Log console over the built-in USB (USB-Serial-JTAG); UART1 stays free for P1.
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+
+# Task watchdog: a reader/server/supervisor task that hangs for 10 s reboots
+# the device instead of leaving it stuck.
+CONFIG_ESP_TASK_WDT_EN=y
+CONFIG_ESP_TASK_WDT_INIT=y
+CONFIG_ESP_TASK_WDT_PANIC=y
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=10
+
+# Allow SO_LINGER {1,0}: client sockets are aborted (RST) on close, so close()
+# can never block waiting for a FIN to be queued.
+CONFIG_LWIP_SO_LINGER=y
+
+# 16 KB TCP send buffer per client (~16 DSMR4 / ~10 DSMR5 telegrams): tolerates
+# WiFi stalls on a weak link before a slow client is dropped.
+CONFIG_LWIP_TCP_SND_BUF_DEFAULT=16384
+
+# UART interrupt handler in IRAM: keeps receiving P1 bytes while flash is busy.
+CONFIG_UART_ISR_IN_IRAM=y
+
+# The setup portal does not subscribe to HTTP server events.
+CONFIG_HTTPD_ENABLE_EVENTS=n
+
+# No FreeRTOS software timers are used (esp_timer instead): no "Tmr Svc" task.
+CONFIG_FREERTOS_USE_TIMERS=n
+
+# The ESP32-C3 SuperMini has 4 MB of flash (the default config assumes 2 MB).
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
