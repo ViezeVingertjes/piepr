@@ -16,6 +16,7 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "lang_pick.h"
 #include "lwip/sockets.h"
 #include "setup_state.h"
 #include "status_led.h"
@@ -35,10 +36,11 @@
 #define MAX_RECV_TIMEOUTS     3
 #define RESTART_AFTER_SAVE_MS 1000
 #define TIMEOUT_CHECK_MS      1000
+#define ACCEPT_LANGUAGE_MAX   96 /* the start of the header is what decides */
 
 static const char *TAG = "setup";
 
-/* Pages gzipped at build time (scripts/gen_web.py). */
+/* Pages gzipped at build time (scripts/gen_web.py), each in English and Dutch. */
 typedef struct {
     const uint8_t *start;
     const uint8_t *end;
@@ -50,6 +52,17 @@ typedef struct {
 EMBEDDED_PAGE(setup);
 EMBEDDED_PAGE(saved);
 EMBEDDED_PAGE(invalid);
+EMBEDDED_PAGE(setup_nl);
+EMBEDDED_PAGE(saved_nl);
+EMBEDDED_PAGE(invalid_nl);
+
+typedef struct {
+    const page_t *english;
+    const page_t *dutch;
+} localized_page_t;
+static const localized_page_t SETUP_PAGE = { &PAGE_setup, &PAGE_setup_nl };
+static const localized_page_t SAVED_PAGE = { &PAGE_saved, &PAGE_saved_nl };
+static const localized_page_t INVALID_PAGE = { &PAGE_invalid, &PAGE_invalid_nl };
 
 /* Carries a setup request across esp_restart() (lost on power-up/RST). */
 typedef struct {
@@ -114,8 +127,20 @@ static esp_err_t send_response(httpd_req_t *req, const char *status, const char 
     return httpd_resp_send(req, body, (ssize_t)len);
 }
 
-static esp_err_t send_page(httpd_req_t *req, const char *status, const page_t *page)
+/* Dutch for a browser that asks for it (Accept-Language), English otherwise. */
+static bool wants_dutch(httpd_req_t *req)
 {
+    char header[ACCEPT_LANGUAGE_MAX] = { 0 };
+    esp_err_t err = httpd_req_get_hdr_value_str(req, "Accept-Language", header, sizeof(header));
+    if (err != ESP_OK && err != ESP_ERR_HTTPD_RESULT_TRUNC) {
+        return false;
+    }
+    return lang_prefers_dutch(header, strnlen(header, sizeof(header)));
+}
+
+static esp_err_t send_page(httpd_req_t *req, const char *status, const localized_page_t *pages)
+{
+    const page_t *page = wants_dutch(req) ? pages->dutch : pages->english;
     httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
     return send_response(req, status, "text/html; charset=utf-8", page->start,
                          (size_t)(page->end - page->start));
@@ -164,14 +189,14 @@ static esp_err_t handle_scan(httpd_req_t *req)
 
 static esp_err_t handle_form(httpd_req_t *req)
 {
-    return send_page(req, HTTPD_200, &PAGE_setup);
+    return send_page(req, HTTPD_200, &SETUP_PAGE);
 }
 
 static esp_err_t handle_save(httpd_req_t *req)
 {
     char body[MAX_FORM_BODY];
     if (req->content_len > sizeof(body)) {
-        return send_page(req, HTTPD_400, &PAGE_invalid);
+        return send_page(req, HTTPD_400, &INVALID_PAGE);
     }
     size_t received = 0;
     int timeouts = 0;
@@ -188,7 +213,7 @@ static esp_err_t handle_save(httpd_req_t *req)
 
     wifi_credentials_t creds;
     if (wifi_form_parse(body, received, &creds) != WIFI_FORM_OK) {
-        return send_page(req, HTTPD_400, &PAGE_invalid);
+        return send_page(req, HTTPD_400, &INVALID_PAGE);
     }
     esp_err_t err = wifi_credentials_save(&creds);
     if (err != ESP_OK) {
@@ -196,7 +221,7 @@ static esp_err_t handle_save(httpd_req_t *req)
         return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Saving failed");
     }
     ESP_LOGI(TAG, "saved WiFi settings for \"%s\", restarting", creds.ssid);
-    send_page(req, HTTPD_200, &PAGE_saved);
+    send_page(req, HTTPD_200, &SAVED_PAGE);
     vTaskDelay(pdMS_TO_TICKS(RESTART_AFTER_SAVE_MS)); /* let the page reach the phone */
     esp_restart();
 }

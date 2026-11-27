@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Builds and runs one libFuzzer target against lib/p1core + lib/portalcore.
-#   fuzz/run.sh <p1_framer|wifi_form|captive_dns|json_escape> [seconds=30]
+#   fuzz/run.sh <p1_framer|wifi_form|captive_dns|json_escape|lang_pick> [seconds=30]
 # Needs clang. Findings (crash-*/leak-*) are written to fuzz/build/.
 set -euo pipefail
 
-target="${1:?usage: fuzz/run.sh <p1_framer|wifi_form|captive_dns|json_escape> [seconds]}"
+target="${1:?usage: fuzz/run.sh <p1_framer|wifi_form|captive_dns|json_escape|lang_pick> [seconds]}"
 seconds="${2:-30}"
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(dirname "$here")"

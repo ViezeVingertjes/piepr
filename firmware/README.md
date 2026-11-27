@@ -50,7 +50,8 @@ you save one. To change the network later: **hold BOOT until the LED double-blin
 3. Enter the password (shown while typing; skipped for open networks).
 4. Save. The device restarts and joins.
 
-The page works offline (gzipped in flash, about 5 KB). Name 1–32 bytes, password
+The page is in Dutch on a phone set to Dutch and in English otherwise. It works
+offline (gzipped in flash, about 5 KB per language). Name 1–32 bytes, password
 empty or 8–63 bytes; checked on the page and again on the device. Without
 JavaScript, or on old browsers, it falls back to a plain form.
 
@@ -85,13 +86,14 @@ device retries the saved network. A temporary outage needs no action.
 | `src/setup_portal.c` | Setup request/restart; setup boot: hotspot, web form, captive DNS, timeout |
 | `src/mdns_announce.c` | mDNS hostname + service |
 | `src/status_led.c` | LED patterns; 125 ms tick also polls the button |
-| `web/` | Setup pages, gzipped and embedded at build time |
+| `web/` | Setup pages; text marked `[[like this]]` is translated with `nl.json`. Gzipped and embedded at build time, in English and Dutch |
 | `lib/p1core/` | Pure C: `crc16`, `p1_framer` |
-| `lib/portalcore/` | Pure C: `wifi_form`, `captive_dns`, `channel_pick`, `json_escape`, `setup_state` (network list, page JSON), `recovery` |
+| `lib/portalcore/` | Pure C: `wifi_form`, `captive_dns`, `channel_pick`, `json_escape`, `lang_pick`, `setup_state` (network list, page JSON), `recovery` |
 | `test/` | Unity tests, one folder per module (`pio test -e native`) |
 | `fuzz/` | libFuzzer harnesses: `fuzz/run.sh <target> [seconds]` |
 | `scripts/` | Build steps: `gen_secrets.py`, `gen_version.py`, `gen_web.py`, `gen_common.py`, `native_sanitizers.py`; `release_image.sh` makes the release file |
 | `sdkconfig.defaults` | ESP-IDF options (explained in the file) |
+| `partitions.csv` | Flash layout: two firmware slots and the settings |
 
 Conventions: module name as function prefix (`tcp_server_*`), file-static state `s_`,
 constants `UPPER_CASE`. Format with `.clang-format`
@@ -117,7 +119,7 @@ constants `UPPER_CASE`. Format with `.clang-format`
 ## Testing
 - `pio test -e native` (Linux/macOS, gcc or clang): unit tests for all pure-C
   modules, with AddressSanitizer and UndefinedBehaviorSanitizer.
-- `fuzz/run.sh p1_framer|wifi_form|captive_dns|json_escape [seconds]` (needs clang).
+- `fuzz/run.sh p1_framer|wifi_form|captive_dns|json_escape|lang_pick [seconds]` (needs clang).
 
 ## Security
 - The TCP stream is **plain text without authentication** on your LAN, by design.

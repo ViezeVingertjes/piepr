@@ -25,7 +25,7 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
   per stuk): een ESP32-C3 SuperMini, een RJ12-kabel, een weerstand en een diode
 
 <p align="center">
-  <img src="assets/setup-flow.png" alt="Wifi instellen op een telefoon: netwerk kiezen, wachtwoord invullen, opgeslagen" width="820">
+  <img src="assets/setup-flow.nl.png" alt="Wifi instellen op een telefoon: netwerk kiezen, wachtwoord invullen, opgeslagen" width="820">
 </p>
 
 ## Piepr gebruiken
@@ -34,8 +34,7 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
 2. Zodra het lampje **dubbel knippert**, verbind je je telefoon met het wifi-netwerk
    **Piepr-Setup**. Het wachtwoord is **piepr1234**, of je eigen `setup_pass` als je
    de firmware zelf hebt gebouwd. De instelpagina opent vanzelf (zo niet, ga dan naar
-   `http://192.168.4.1` terwijl je telefoon op Piepr-Setup zit). De pagina is in het
-   Engels.
+   `http://192.168.4.1` terwijl je telefoon op Piepr-Setup zit).
 3. Kies je thuisnetwerk, vul het wachtwoord in en sla op. Piepr werkt alleen met
    **2,4 GHz**-wifi.
 4. Als het lampje **blijft branden**, is Piepr verbonden.
@@ -56,7 +55,7 @@ dubbel knippert (ongeveer 5 seconden).
 | Probleem | Wat je doet |
 |---|---|
 | Piepr-Setup staat niet in je wifi-lijst | wacht 5 minuten, of houd BOOT ingedrukt tot het lampje dubbel knippert |
-| Je netwerk staat er niet bij | het moet 2,4 GHz zijn met een goed signaal; zet de router of een versterker dichterbij, of kies *Other network…* |
+| Je netwerk staat er niet bij | het moet 2,4 GHz zijn met een goed signaal; zet de router of een versterker dichterbij, of kies *Ander netwerk…* |
 | `piepr.local` werkt niet | zoek `piepr` op in de apparatenlijst van je router en gebruik het IP-adres |
 
 ## Meters

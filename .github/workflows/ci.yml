@@ -83,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [p1_framer, wifi_form, captive_dns, json_escape]
+        target: [p1_framer, wifi_form, captive_dns, json_escape, lang_pick]
     steps:
       - uses: actions/checkout@v7
       - run: firmware/fuzz/run.sh ${{ matrix.target }} 60
