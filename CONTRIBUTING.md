@@ -34,7 +34,8 @@ tools/render_images.sh                             # after editing an image in a
 ```
 
 The images are edited in `assets/src/` and `hardware/src/`; the script turns their
-text into outlines, so they look the same on a machine without the Ubuntu font.
+text into outlines, so they look the same on a machine without the Ubuntu font. An
+image with text has a Dutch twin, `name.nl.svg`, for the Dutch pages: change both.
 
 A change to the parsing code in `lib/` comes with a test. The same checks run
 on every pull request.

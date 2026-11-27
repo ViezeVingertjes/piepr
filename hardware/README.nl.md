@@ -5,9 +5,7 @@ Nederlands · [English](README.md)
 Alles om je eigen Piepr te bouwen: onderdelen, bedrading en controles. Reken op een
 avond met een soldeerbout en een multimeter.
 
-![Bedradingsschema](wiring-diagram.svg)
-
-De afbeeldingen zijn in het Engels.
+![Bedradingsschema](wiring-diagram.nl.svg)
 
 ## 1. Onderdelen
 
@@ -67,7 +65,7 @@ aan de achterkant, de kabel naar beneden**: pin 1 zit **links** (kijk ook op de 
 van de verkoper). Zet de multimeter op de pieptoon en zoek bij elk contact de losse
 draad die erbij hoort.
 
-![Pin 1 vinden](step-1-find-pin-1.svg)
+![Pin 1 vinden](step-1-find-pin-1.nl.svg)
 
 | P1-pin | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
@@ -90,7 +88,7 @@ Krimpkous om lange pootjes.
 **Kant zonder streepje → P1-draad, streepje → bordje.** Schuif eerst 3 mm krimpkous over de draad
 en krimp die daarna over de diode.
 
-![Richting van de diode](step-4-diode.svg)
+![Richting van de diode](step-4-diode.nl.svg)
 
 ### Stap 5: Draden aan het bordje
 Zie het bedradingsschema bovenaan deze pagina.

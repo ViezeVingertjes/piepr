@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="Piepr: je slimme meter, live op je eigen netwerk" width="100%">
+  <img src="assets/banner.nl.svg" alt="Piepr: je slimme meter, live op je eigen netwerk" width="100%">
 </p>
 
 <p align="center">
