@@ -2,13 +2,14 @@
 
 #include <string.h>
 
+#include "config.h"
 #include "esp_log.h"
 #include "nvs.h"
 
 #define NVS_NAMESPACE "wifi_creds"
 #define KEY_CREDS     "creds" /* one blob: name and password are written together */
 
-static const char *TAG = "wifi_creds";
+static const char *TAG = LOG_TAG_CREDS;
 
 static bool load_saved(wifi_credentials_t *out)
 {

@@ -26,7 +26,7 @@
 _Static_assert(SUPERVISOR_PERIOD_S < CONFIG_ESP_TASK_WDT_TIMEOUT_S,
                "supervisor must feed the watchdog");
 
-static const char *TAG = "main";
+static const char *TAG = LOG_TAG_MAIN;
 
 /* Never boot-loops on NVS: erase and retry on any error, else run without it. */
 static bool nvs_init(void)
@@ -122,9 +122,59 @@ static void supervise(const char *recovery_ssid)
     }
 }
 
+/* Piepr's own modules log at INFO. ESP-IDF's components start at warnings (see
+ * sdkconfig.defaults); the web server's stay at errors, because phones that
+ * probe for internet drop connections all the time. */
+static void set_log_levels(void)
+{
+    static const char *const OWN[] = LOG_TAGS;
+    for (size_t i = 0; i < sizeof(OWN) / sizeof(OWN[0]); i++) {
+        esp_log_level_set(OWN[i], ESP_LOG_INFO);
+    }
+    static const char *const WEB_SERVER[] = { "httpd_txrx", "httpd_parse", "httpd_sess",
+                                              "httpd_uri" };
+    for (size_t i = 0; i < sizeof(WEB_SERVER) / sizeof(WEB_SERVER[0]); i++) {
+        esp_log_level_set(WEB_SERVER[i], ESP_LOG_ERROR);
+    }
+}
+
+/* Why the device started, in a word; `*trouble` when it wasn't on purpose. */
+static const char *start_reason(esp_reset_reason_t reason, bool *trouble)
+{
+    *trouble = true;
+    switch (reason) {
+    case ESP_RST_PANIC:
+        return "a crash";
+    case ESP_RST_INT_WDT:
+    case ESP_RST_TASK_WDT:
+    case ESP_RST_WDT:
+        return "a hang (watchdog)";
+    case ESP_RST_BROWNOUT:
+        return "a power dip";
+    default:
+        break;
+    }
+    *trouble = false;
+    switch (reason) {
+    case ESP_RST_POWERON:
+        return "power-on";
+    case ESP_RST_SW:
+        return "a restart";
+    case ESP_RST_USB:
+        return "a reset over USB";
+    default:
+        return "a reset";
+    }
+}
+
 void app_main(void)
 {
-    ESP_LOGI(TAG, "piepr %s starting (reset reason %d)", FW_VERSION, (int)esp_reset_reason());
+    set_log_levels();
+    esp_reset_reason_t reset = esp_reset_reason();
+    bool trouble;
+    const char *why = start_reason(reset, &trouble);
+    ESP_LOG_LEVEL(trouble ? ESP_LOG_WARN : ESP_LOG_INFO, TAG,
+                  "piepr %s starting after %s (reset reason %d)", FW_VERSION, why, (int)reset);
 
     bool nvs_ok = nvs_init();
     bool setup_requested = setup_portal_requested();

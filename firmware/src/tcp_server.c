@@ -38,7 +38,7 @@ _Static_assert(SELECT_TIMEOUT_MS < CONFIG_ESP_TASK_WDT_TIMEOUT_S * 1000, "must f
 _Static_assert(TCP_MAX_CLIENTS + 1 <= CONFIG_LWIP_MAX_SOCKETS,
                "clients + listener must fit lwIP's sockets");
 
-static const char *TAG = "tcp";
+static const char *TAG = LOG_TAG_TCP;
 
 typedef struct {
     int fd;              /* -1 = free */

@@ -9,6 +9,8 @@
 #include "config.h"
 #include "dhcpserver/dhcpserver.h"
 #include "esp_attr.h"
+#include "esp_event.h"
+#include "esp_wifi.h"
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -39,7 +41,7 @@
 #define ACCEPT_LANGUAGE_MAX   96 /* the start of the header is what decides */
 #define LANG_QUERY_MAX        16 /* "lang=nl"; a longer query is none of ours */
 
-static const char *TAG = "setup";
+static const char *TAG = LOG_TAG_SETUP;
 
 /* Pages gzipped at build time (scripts/gen_web.py), each in English and Dutch. */
 typedef struct {
@@ -315,6 +317,21 @@ static void dns_task(void *arg)
     }
 }
 
+/* The WiFi driver's own "station join/leave" lines are not shown; these are. */
+static void on_hotspot_event(void *arg, esp_event_base_t base, int32_t id, void *data)
+{
+    (void)arg;
+    (void)base;
+    (void)data;
+    static int joined;
+    if (id == WIFI_EVENT_AP_STACONNECTED) {
+        ESP_LOGI(TAG, "a device joined the hotspot (%d connected)", ++joined);
+    } else if (id == WIFI_EVENT_AP_STADISCONNECTED) {
+        joined = joined > 0 ? joined - 1 : 0;
+        ESP_LOGI(TAG, "a device left the hotspot (%d connected)", joined);
+    }
+}
+
 void setup_portal_run(bool has_wifi)
 {
     status_led_show_setup();
@@ -322,6 +339,10 @@ void setup_portal_run(bool has_wifi)
     configASSERT(portal != NULL);
     uint8_t channel;
     esp_netif_t *ap = wifi_start_setup_ap(&channel);
+    ESP_ERROR_CHECK(
+        esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STACONNECTED, on_hotspot_event, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STADISCONNECTED,
+                                               on_hotspot_event, NULL));
     esp_netif_ip_info_t ip;
     ESP_ERROR_CHECK(esp_netif_get_ip_info(ap, &ip));
     memcpy(portal->ip, &ip.ip.addr, sizeof(portal->ip));

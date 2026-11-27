@@ -8,7 +8,7 @@
 #define MDNS_SERVICE_TYPE  "_dsmr"
 #define MDNS_PROTO         "_tcp"
 
-static const char *TAG = "mdns";
+static const char *TAG = LOG_TAG_MDNS;
 
 void mdns_announce_start(void)
 {

@@ -38,7 +38,7 @@ Reading it: any DSMR software that connects over TCP, at host `piepr.local`,
 port `8088`. Home Assistant: Settings → Devices & services → Add integration →
 *DSMR Smart Meter* → *Network*; DSMR version 4 or 5, usually printed
 on the front of the meter; 5B in Belgium. If `.local` doesn't resolve, use the IP of
-`piepr` from your router's device list (or the log line `wifi: connected, ip=…`).
+`piepr` from your router's device list (or the log line `net: connected, ip=…`).
 
 ## WiFi setup (phone)
 With no network configured, the device starts in setup mode and stays there until
@@ -89,8 +89,8 @@ device retries the saved network. A temporary outage needs no action.
 | `src/mdns_announce.c` | mDNS hostname + service |
 | `src/status_led.c` | LED patterns; 125 ms tick also polls the button |
 | `web/` | Setup pages; text marked `[[like this]]` is translated with `nl.json`. Gzipped and embedded at build time, in English and Dutch |
-| `lib/p1core/` | Pure C: `crc16`, `p1_framer` |
-| `lib/portalcore/` | Pure C: `wifi_form`, `captive_dns`, `channel_pick`, `json_escape`, `lang_pick`, `setup_state` (network list, page JSON), `recovery` |
+| `lib/p1core/` | Pure C: `crc16`, `p1_framer`, `p1_ident` (the meter's type name, for the log) |
+| `lib/portalcore/` | Pure C: `wifi_form`, `captive_dns`, `channel_pick`, `json_escape`, `lang_pick`, `setup_state` (network list, page JSON), `recovery`, `wifi_reason` (disconnect reasons in words) |
 | `test/` | Unity tests, one folder per module (`pio test -e native`) |
 | `fuzz/` | libFuzzer harnesses: `fuzz/run.sh <target> [seconds]` |
 | `scripts/` | Build steps: `gen_secrets.py`, `gen_version.py`, `gen_web.py`, `gen_common.py`, `native_sanitizers.py`; `release_image.sh` makes the release file |

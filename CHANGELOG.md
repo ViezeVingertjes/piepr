@@ -3,6 +3,9 @@
 ## Unreleased
 
 - A link at the top of the setup page switches between Dutch and English
+- A shorter, clearer log: only Piepr's own lines, the reason for a start-up or a lost
+  WiFi connection in words, a line when telegrams start arriving and when a phone joins
+  the setup hotspot. The WiFi lines are now tagged `net:`
 
 ## 1.1.0 - 2026-11-27
 

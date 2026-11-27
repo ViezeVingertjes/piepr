@@ -1,5 +1,6 @@
 #include "p1_reader.h"
 
+#include <stdbool.h>
 #include <string.h>
 
 #include "config.h"
@@ -13,6 +14,7 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 #include "p1_framer.h"
+#include "p1_ident.h"
 #include "status_led.h"
 #include "tcp_server.h"
 
@@ -27,8 +29,9 @@
 #define EVENT_TIMEOUT_MS       1000
 _Static_assert(EVENT_TIMEOUT_MS < CONFIG_ESP_TASK_WDT_TIMEOUT_S * 1000, "must feed the watchdog");
 #define STATS_PERIOD_S 60
+#define IDENT_MAX      32 /* characters of the meter's name shown in the log */
 
-static const char *TAG = "p1";
+static const char *TAG = LOG_TAG_P1;
 
 static QueueHandle_t s_uart_queue;
 static p1_framer_t s_framer; /* 4 KB: static, not on the task stack */
@@ -37,6 +40,7 @@ static struct {
     uint32_t ok, crc_err, overflow, uart_err;
 } s_stats;
 static int64_t s_last_ok_us;
+static bool s_receiving; /* cleared when a minute passes without a valid telegram */
 
 static void feed_bytes(const uint8_t *data, size_t n)
 {
@@ -49,7 +53,13 @@ static void feed_bytes(const uint8_t *data, size_t n)
             status_led_flicker();
             s_stats.ok++;
             s_last_ok_us = esp_timer_get_time();
-            ESP_LOGD(TAG, "telegram OK (%u bytes)", (unsigned)len);
+            if (!s_receiving) {
+                s_receiving = true;
+                char ident[IDENT_MAX + 1];
+                p1_ident(t, len, ident, sizeof(ident));
+                ESP_LOGI(TAG, "telegrams arriving from \"%s\" (%u bytes each)", ident,
+                         (unsigned)len);
+            }
             break;
         }
         case P1_FRAME_CRC_ERROR:
@@ -95,7 +105,8 @@ static void handle_event(const uart_event_t *ev)
     }
 }
 
-/* One line per minute: the only place telegram results are reported. */
+/* One line per minute with the counts; a silent minute is a warning, and the
+ * next valid telegram is announced again. */
 static void log_stats(int64_t now)
 {
     int64_t idle_s = (now - s_last_ok_us) / US_PER_S;
@@ -106,6 +117,9 @@ static void log_stats(int64_t now)
         STATS_PERIOD_S, (unsigned long)s_stats.ok, (unsigned long)s_stats.crc_err,
         (unsigned long)s_stats.overflow, (unsigned long)s_stats.uart_err, idle_s,
         stale ? " (check wiring / pull-up / pin 2)" : "");
+    if (stale) {
+        s_receiving = false;
+    }
     memset(&s_stats, 0, sizeof(s_stats));
 }
 

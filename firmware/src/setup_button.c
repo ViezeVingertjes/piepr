@@ -9,7 +9,7 @@
 
 #define HOLD_TICKS (SETUP_HOLD_S * 1000 / UI_TICK_MS)
 
-static const char *TAG = "button";
+static const char *TAG = LOG_TAG_BUTTON;
 
 static bool s_enabled;
 static bool s_armed; /* released once since boot, so a stuck button can't loop setup */

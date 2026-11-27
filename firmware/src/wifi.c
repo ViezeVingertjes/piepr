@@ -14,6 +14,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "secrets_gen.h"
+#include "wifi_reason.h"
 
 _Static_assert(WIFI_SSID_MAX_LEN <= MAX_SSID_LEN && WIFI_PASS_MAX_LEN < MAX_PASSPHRASE_LEN,
                "wifi_form limits must fit the ESP-IDF config fields");
@@ -21,13 +22,24 @@ _Static_assert(sizeof(SETUP_PASS) - 1 >= WIFI_PASS_MIN_LEN &&
                    sizeof(SETUP_PASS) - 1 <= WIFI_PASS_MAX_LEN,
                "setup_pass in secrets.ini must be 8-63 bytes");
 
+_Static_assert(WIFI_REASON_TEXT_AUTH_EXPIRE == WIFI_REASON_AUTH_EXPIRE &&
+                   WIFI_REASON_TEXT_ASSOC_LEAVE == WIFI_REASON_ASSOC_LEAVE &&
+                   WIFI_REASON_TEXT_4WAY_TIMEOUT == WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT &&
+                   WIFI_REASON_TEXT_BEACON_TIMEOUT == WIFI_REASON_BEACON_TIMEOUT &&
+                   WIFI_REASON_TEXT_NO_AP_FOUND == WIFI_REASON_NO_AP_FOUND &&
+                   WIFI_REASON_TEXT_AUTH_FAIL == WIFI_REASON_AUTH_FAIL &&
+                   WIFI_REASON_TEXT_ASSOC_FAIL == WIFI_REASON_ASSOC_FAIL &&
+                   WIFI_REASON_TEXT_HANDSHAKE_TIMEOUT == WIFI_REASON_HANDSHAKE_TIMEOUT &&
+                   WIFI_REASON_TEXT_CONNECTION_FAIL == WIFI_REASON_CONNECTION_FAIL,
+               "wifi_reason.h must use ESP-IDF's reason numbers");
+
 #define BACKOFF_MIN_US (1 * US_PER_S)
 #define BACKOFF_MAX_US (30 * US_PER_S)
 #define SCAN_ATTEMPTS  5
 #define SCAN_RETRY_MS  1000 /* the driver refuses a scan while it is busy */
 #define SCAN_ROUNDS    3    /* averaged: one weak moment doesn't decide the order */
 
-static const char *TAG = "wifi";
+static const char *TAG = LOG_TAG_NET;
 
 static atomic_bool s_connected = false;
 static atomic_bool s_ever_connected = false;
@@ -36,7 +48,8 @@ static atomic_uint s_auth_failures;
 static esp_timer_handle_t s_reconnect_timer;
 static _Atomic int64_t s_backoff_us = BACKOFF_MIN_US; /* event task + esp_timer task */
 
-static void schedule_reconnect(void)
+/* Returns the seconds until the next attempt, for the caller's log line. */
+static int schedule_reconnect(void)
 {
     int64_t delay = atomic_load(&s_backoff_us);
     atomic_store(&s_backoff_us, delay * 2 > BACKOFF_MAX_US ? BACKOFF_MAX_US : delay * 2);
@@ -44,10 +57,10 @@ static void schedule_reconnect(void)
     esp_timer_stop(s_reconnect_timer);
     esp_err_t err = esp_timer_start_once(s_reconnect_timer, (uint64_t)delay);
     if (err != ESP_OK) {
+        /* The supervisor restarts the device if WiFi stays down. */
         ESP_LOGE(TAG, "reconnect timer failed: %s", esp_err_to_name(err));
-        return; /* the supervisor restarts the device if WiFi stays down */
     }
-    ESP_LOGI(TAG, "reconnecting in %lld s", delay / US_PER_S);
+    return (int)(delay / US_PER_S);
 }
 
 /* A rejected attempt produces no DISCONNECTED event: without this retry the
@@ -56,8 +69,8 @@ static void connect_or_retry(void)
 {
     esp_err_t err = esp_wifi_connect();
     if (err != ESP_OK) {
-        ESP_LOGW(TAG, "connect failed: %s", esp_err_to_name(err));
-        schedule_reconnect();
+        ESP_LOGW(TAG, "connect failed: %s; retrying in %d s", esp_err_to_name(err),
+                 schedule_reconnect());
     }
 }
 
@@ -91,20 +104,23 @@ static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
         const wifi_event_sta_disconnected_t *d = data;
         atomic_store(&s_connected, false);
-        ESP_LOGW(TAG, "disconnected (reason %d)", d->reason);
         if (is_auth_failure(d->reason)) {
             atomic_fetch_add(&s_auth_failures, 1);
         } else {
             atomic_store(&s_auth_failures, 0);
         }
-        schedule_reconnect();
+        const char *why = wifi_reason_text(d->reason);
+        ESP_LOGW(TAG, "disconnected (reason %d%s%s); retrying in %d s", d->reason,
+                 why != NULL ? ": " : "", why != NULL ? why : "", schedule_reconnect());
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         const ip_event_got_ip_t *e = data;
         atomic_store(&s_connected, true);
         atomic_store(&s_ever_connected, true);
         atomic_store(&s_auth_failures, 0);
         atomic_store(&s_backoff_us, BACKOFF_MIN_US);
-        ESP_LOGI(TAG, "connected, ip=" IPSTR, IP2STR(&e->ip_info.ip));
+        int rssi = 0;
+        esp_wifi_sta_get_rssi(&rssi);
+        ESP_LOGI(TAG, "connected, ip=" IPSTR ", signal %d dBm", IP2STR(&e->ip_info.ip), rssi);
     } else if (base == IP_EVENT && id == IP_EVENT_STA_LOST_IP) {
         atomic_store(&s_connected, false);
         ESP_LOGW(TAG, "lost IP address, reconnecting");

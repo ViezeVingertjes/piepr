@@ -24,7 +24,7 @@
 #define TCP_SERVER_TASK_PRIO  5
 
 /* Supervisor (normal mode) */
-#define HEARTBEAT_PERIOD_S  60
+#define HEARTBEAT_PERIOD_S  (5 * 60)
 #define OFFLINE_RESTART_S   (15 * 60)
 #define NO_CLIENT_RESTART_S (30 * 60)   /* online, readers seen since boot, but none now */
 #define MIN_HEAP_BLOCK      (16 * 1024) /* largest free block below this: restart */
@@ -38,3 +38,17 @@
 #define SETUP_SURVEY_MAX        48 /* network names tracked while surveying */
 #define SETUP_TIMEOUT_S         600
 #define RECOVERY_SETUP_WINDOW_S 300 /* setup window after automatic recovery */
+
+/* Log tags, one per module. main.c shows these at INFO and keeps ESP-IDF's own
+ * components to warnings and errors. */
+#define LOG_TAG_MAIN   "main"
+#define LOG_TAG_CREDS  "wifi_creds"
+#define LOG_TAG_NET    "net" /* not "wifi": that is the WiFi driver's own tag */
+#define LOG_TAG_SETUP  "setup"
+#define LOG_TAG_BUTTON "button"
+#define LOG_TAG_MDNS   "mdns"
+#define LOG_TAG_TCP    "tcp"
+#define LOG_TAG_P1     "p1"
+#define LOG_TAGS                                                                                   \
+    { LOG_TAG_MAIN,   LOG_TAG_CREDS, LOG_TAG_NET, LOG_TAG_SETUP,                                   \
+      LOG_TAG_BUTTON, LOG_TAG_MDNS,  LOG_TAG_TCP, LOG_TAG_P1 }

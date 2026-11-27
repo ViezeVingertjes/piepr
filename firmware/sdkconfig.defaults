@@ -35,3 +35,10 @@ CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
 # installed one doesn't start (see partitions.csv). The bootloader itself is
 # only ever written over USB, so this is switched on before it is needed.
 CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y
+
+# Log: ESP-IDF's components and the bootloader only speak up when something is
+# wrong; Piepr's own modules are raised to INFO at start-up (set_log_levels in
+# src/main.c). The maximum level keeps those INFO lines in the build.
+CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y
+CONFIG_LOG_DEFAULT_LEVEL_WARN=y
+CONFIG_LOG_MAXIMUM_LEVEL_INFO=y
