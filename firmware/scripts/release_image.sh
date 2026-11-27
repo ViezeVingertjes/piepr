@@ -15,7 +15,7 @@ out="$outdir/$name"
 
 BOOTLOADER_AT=0x0
 PARTITIONS_AT=0x8000
-FIRMWARE_AT=0x10000
+FIRMWARE_AT=0x20000
 
 for part in bootloader partitions firmware; do
     [ -f "$build/$part.bin" ] || { echo "missing $build/$part.bin: run 'pio run' first" >&2; exit 1; }
