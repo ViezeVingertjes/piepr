@@ -11,23 +11,21 @@ De afbeeldingen zijn in het Engels.
 
 ## 1. Onderdelen
 
-Je eerste Piepr kost ongeveer €16 inclusief verzending bij AliExpress; in één Piepr
-zit voor ongeveer €5,40 aan onderdelen, dus je houdt flink wat over. De eerste vier
-pakketjes worden samen gratis verzonden (bestelling boven €10); de diodes worden apart
-verzonden.
-Prijzen bekeken op 27 nov 2026 (Nederland). Links verdwijnen en prijzen veranderen:
-de zoekterm werkt altijd.
+In één Piepr zit voor ongeveer €5,35 aan onderdelen. Weerstanden, diodes en krimpkous
+koop je per zakje, dus je eerste bestelling bij AliExpress komt op ongeveer €16
+inclusief verzending en je houdt over voor meer. Prijzen bekeken op 27 nov 2026
+(Nederland). Links verdwijnen en prijzen veranderen: de zoekterm werkt altijd.
 
-| Onderdeel | Bestellen | Verpakking | Per Piepr | Zoekterm |
-|---|---|---|---|---|
-| ESP32-C3 SuperMini (niet "Plus") | [1 bordje](https://www.aliexpress.com/item/1005006860780404.html) | €3,79 | €3,79 | `ESP32-C3 SuperMini` |
-| RJ12-kabel **6P6C** (alle 6 aders), doormidden geknipt | [1 m, variant BK1-1M](https://www.aliexpress.com/item/1005005985195084.html) | €2,96 | €1,48 | `RJ12 6P6C cable` |
-| Weerstand **2,2 kΩ**, 1/4 W (1–4,7 kΩ werkt ook) | [100 stuks, variant 2.2K](https://www.aliexpress.com/item/1005005669886834.html) | €2,40 | €0,02 | `2.2K 1/4W resistor` |
-| Krimpkous, 2 mm en 3 mm | [set van 127](https://www.aliexpress.com/item/1005008123196951.html) | €1,99 | €0,05 | `heat shrink kit` |
-| Schottky-diode **1N5819** (DO-41) | [100 stuks](https://www.aliexpress.com/item/32886942865.html) | €1,18 + €3,53 verzending | €0,01 | `1N5819 DO-41` |
-| Totaal | | €15,85 | €5,35 | |
-| USB-C-kabel (USB-A naar C) + USB-lader van 5 V | heeft bijna iedereen liggen | | | `5V USB charger` |
-| Optioneel: condensator van 470–1000 µF | alleen als een DSMR 5-meter het bordje voedt | | | `1000uF 10V capacitor` |
+| Onderdeel | Per Piepr | Waar | Zoekterm |
+|---|---|---|---|
+| ESP32-C3 SuperMini (niet "Plus") | €3,79 | [AliExpress](https://www.aliexpress.com/item/1005006860780404.html) | `ESP32-C3 SuperMini` |
+| RJ12-kabel **6P6C** (alle 6 aders), de helft van een kabel van 1 m | €1,48 | [AliExpress, variant BK1-1M](https://www.aliexpress.com/item/1005005985195084.html) | `RJ12 6P6C cable` |
+| Weerstand **2,2 kΩ**, 1/4 W (1–4,7 kΩ werkt ook) | €0,02 | [AliExpress, variant 2.2K](https://www.aliexpress.com/item/1005005669886834.html) | `2.2K 1/4W resistor` |
+| Krimpkous, 2 mm en 3 mm | €0,05 | [AliExpress](https://www.aliexpress.com/item/1005008123196951.html) | `heat shrink kit` |
+| Schottky-diode **1N5819** (DO-41) | €0,01 | [AliExpress](https://www.aliexpress.com/item/32886942865.html) | `1N5819 DO-41` |
+| Totaal | €5,35 | | |
+| USB-C-kabel (USB-A naar C) + USB-lader van 5 V | | heeft bijna iedereen liggen | `5V USB charger` |
+| Optioneel: condensator van 470–1000 µF | | alleen als een DSMR 5-meter het bordje voedt | `1000uF 10V capacitor` |
 
 Neem een kabel van **USB-A naar USB-C**: veel SuperMini-klonen starten niet op aan een
 lader met USB-C naar C (PD). Elke lader van 5 V is sterk genoeg: het bordje gebruikt

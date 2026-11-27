@@ -21,8 +21,8 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
 - Wifi stel je in op je telefoon: je kiest uit een lijst met netwerken in de buurt
 - Herstelt zichzelf: komt hij niet op je wifi, dan komt de setup-hotspot terug en zie
   je waarom
-- Ongeveer €16 inclusief verzending voor je eerste (ongeveer €5,40 aan onderdelen
-  per stuk): een ESP32-C3 SuperMini, een RJ12-kabel, een weerstand en een diode
+- Ongeveer €5 aan onderdelen: een ESP32-C3 SuperMini, een RJ12-kabel, een weerstand en
+  een diode
 
 <p align="center">
   <img src="assets/setup-flow.nl.png" alt="Wifi instellen op een telefoon: netwerk kiezen, wachtwoord invullen, opgeslagen" width="820">
@@ -70,7 +70,7 @@ meter? Maak een [metermelding](https://github.com/ViezeVingertjes/piepr/issues/n
 
 ## Zelf bouwen
 
-1. Hardware: onderdelenlijst (ongeveer €16), bedrading en controles in de [bouwgids](hardware/README.nl.md).
+1. Hardware: onderdelenlijst, bedrading en controles in de [bouwgids](hardware/README.nl.md).
 2. Firmware: [installeer hem vanuit je browser](https://piepr.nl/installeren/), of bouw hem
    zelf; zie de [firmwaregids](firmware/README.md) (Engels).
 

@@ -21,8 +21,7 @@ available on your own network. No app, no account, no cloud.
 - WiFi setup from your phone, with a list of nearby networks
 - Recovers by itself: when it can't join your WiFi, the setup hotspot comes back and
   says why
-- About €16 delivered for your first one (about €5.40 in parts each): an ESP32-C3
-  SuperMini, an RJ12 cable, a resistor and a diode
+- About €5 in parts: an ESP32-C3 SuperMini, an RJ12 cable, a resistor and a diode
 
 <p align="center">
   <img src="assets/setup-flow.png" alt="Setting up WiFi from a phone: pick a network, enter the password, saved" width="820">
@@ -69,7 +68,7 @@ meter? Open a [meter report](https://github.com/ViezeVingertjes/piepr/issues/new
 
 ## Build your own
 
-1. Hardware: parts list (about €16), wiring and checks in the [build guide](hardware/README.md).
+1. Hardware: parts list, wiring and checks in the [build guide](hardware/README.md).
 2. Firmware: [install it from your browser](https://piepr.nl/en/install/), or build your
    own; see the [firmware guide](firmware/README.md).
 

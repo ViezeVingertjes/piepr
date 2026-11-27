@@ -9,22 +9,21 @@ evening with a soldering iron and a multimeter.
 
 ## 1. Parts
 
-Building your first Piepr costs about €16 delivered from AliExpress; the parts
-in one Piepr are worth about €5.40, so the spares go a long way. The first four
-packs ship free together (order over €10); the diodes ship separately. Prices
-checked 27 Nov 2026 (Netherlands). Links die and prices change: the search term
-always works.
+The parts in one Piepr cost about €5.35. Resistors, diodes and heat shrink are sold
+in bags, so a first order from AliExpress comes to about €16 delivered and leaves
+plenty for more. Prices checked 27 Nov 2026 (Netherlands). Links die and prices
+change: the search term always works.
 
-| Part | Get | Pack | Per Piepr | Search term |
-|---|---|---|---|---|
-| ESP32-C3 SuperMini (not "Plus") | [1 board](https://www.aliexpress.com/item/1005006860780404.html) | €3.79 | €3.79 | `ESP32-C3 SuperMini` |
-| RJ12 **6P6C** cable (all 6 wires), cut in half | [1 m, variant BK1-1M](https://www.aliexpress.com/item/1005005985195084.html) | €2.96 | €1.48 | `RJ12 6P6C cable` |
-| Resistor **2.2 kΩ**, 1/4 W (1–4.7 kΩ works) | [100, variant 2.2K](https://www.aliexpress.com/item/1005005669886834.html) | €2.40 | €0.02 | `2.2K 1/4W resistor` |
-| Heat shrink, 2 mm and 3 mm | [kit of 127](https://www.aliexpress.com/item/1005008123196951.html) | €1.99 | €0.05 | `heat shrink kit` |
-| Schottky diode **1N5819** (DO-41) | [100](https://www.aliexpress.com/item/32886942865.html) | €1.18 + €3.53 shipping | €0.01 | `1N5819 DO-41` |
-| Total | | €15.85 | €5.35 | |
-| USB-C cable (USB-A to C) + 5 V USB charger | most people have these | | | `5V USB charger` |
-| Optional: 470–1000 µF capacitor | only if a DSMR 5 meter powers the board | | | `1000uF 10V capacitor` |
+| Part | Per Piepr | Where | Search term |
+|---|---|---|---|
+| ESP32-C3 SuperMini (not "Plus") | €3.79 | [AliExpress](https://www.aliexpress.com/item/1005006860780404.html) | `ESP32-C3 SuperMini` |
+| RJ12 **6P6C** cable (all 6 wires), half of a 1 m cable | €1.48 | [AliExpress, variant BK1-1M](https://www.aliexpress.com/item/1005005985195084.html) | `RJ12 6P6C cable` |
+| Resistor **2.2 kΩ**, 1/4 W (1–4.7 kΩ works) | €0.02 | [AliExpress, variant 2.2K](https://www.aliexpress.com/item/1005005669886834.html) | `2.2K 1/4W resistor` |
+| Heat shrink, 2 mm and 3 mm | €0.05 | [AliExpress](https://www.aliexpress.com/item/1005008123196951.html) | `heat shrink kit` |
+| Schottky diode **1N5819** (DO-41) | €0.01 | [AliExpress](https://www.aliexpress.com/item/32886942865.html) | `1N5819 DO-41` |
+| Total | €5.35 | | |
+| USB-C cable (USB-A to C) + 5 V USB charger | | most people have these | `5V USB charger` |
+| Optional: 470–1000 µF capacitor | | only if a DSMR 5 meter powers the board | `1000uF 10V capacitor` |
 
 Use a **USB-A to USB-C** cable: many SuperMini clones don't power up from a
 USB-C-to-C (PD) charger. Any 5 V charger is strong enough: the board draws about
