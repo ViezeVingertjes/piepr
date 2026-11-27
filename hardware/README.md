@@ -1,5 +1,7 @@
 # Building Piepr
 
+[Nederlands](README.nl.md) · English
+
 Everything you need to build your own Piepr: parts, wiring and checks. It takes an
 evening with a soldering iron and a multimeter.
 

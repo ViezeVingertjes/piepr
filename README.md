@@ -8,6 +8,8 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-FFC21A?labelColor=0E2236"></a>
 </p>
 
+<p align="center"><a href="README.nl.md">Nederlands</a> · English</p>
+
 **Piepr** is a small open-source reader for Dutch and Belgian smart meters. Plug it
 into the meter's P1 port, connect it to WiFi from your phone, and every reading is
 available on your own network. No app, no account, no cloud.
