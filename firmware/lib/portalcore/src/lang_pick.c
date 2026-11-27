@@ -1,5 +1,7 @@
 #include "lang_pick.h"
 
+#include <string.h>
+
 #define WEIGHT_MAX  1000 /* q=1, in thousandths */
 #define WEIGHT_NONE (-1)
 #define Q_DECIMALS  3
@@ -22,6 +24,13 @@ static void trim(const char **s, const char **end)
     while (*end > *s && is_space((*end)[-1])) {
         (*end)--;
     }
+}
+
+/* Where the piece starting at `s` ends: at the next `delimiter`, or at `end`. */
+static const char *piece_end(const char *s, const char *end, char delimiter)
+{
+    const char *found = memchr(s, delimiter, (size_t)(end - s));
+    return found != NULL ? found : end;
 }
 
 /* A weight "0", "0.5", "1.000" as thousandths, or WEIGHT_NONE when it isn't one. */
@@ -53,13 +62,9 @@ static int element_weight(const char *s, const char *end)
     int weight = WEIGHT_MAX;
     while (s < end) {
         const char *param = s;
-        while (s < end && *s != ';') {
-            s++;
-        }
-        const char *param_end = s;
-        if (s < end) {
-            s++; /* past the ';' */
-        }
+        const char *param_end = piece_end(s, end, ';');
+        s = param_end < end ? param_end + 1 : end;
+
         trim(&param, &param_end);
         if (param < param_end && lower(*param) == 'q') {
             const char *value = param + 1;
@@ -90,73 +95,53 @@ bool lang_prefers_dutch(const char *accept_language, size_t len)
     if (accept_language == NULL || len == 0) {
         return false;
     }
-    int dutch = WEIGHT_NONE, english = WEIGHT_NONE;
-    int dutch_at = 0, english_at = 0; /* which list element set that weight */
+    /* The highest weight seen for Dutch or English, and which of the two it was.
+     * Only a higher weight replaces it, so of two equal ones the first listed wins. */
+    int best = WEIGHT_NONE;
+    bool best_is_dutch = false;
 
     const char *s = accept_language;
     const char *header_end = accept_language + len;
-    for (int at = 0; s < header_end; at++) {
-        const char *element = s;
-        while (s < header_end && *s != ',') {
-            s++;
-        }
-        const char *element_end = s;
-        if (s < header_end) {
-            s++; /* past the ',' */
-        }
+    while (s < header_end) {
+        const char *tag = s;
+        const char *element_end = piece_end(s, header_end, ',');
+        s = element_end < header_end ? element_end + 1 : header_end;
 
-        const char *tag_end = element;
-        while (tag_end < element_end && *tag_end != ';') {
-            tag_end++;
-        }
+        const char *tag_end = piece_end(tag, element_end, ';');
         int weight = tag_end < element_end ? element_weight(tag_end + 1, element_end) : WEIGHT_MAX;
-        const char *tag = element;
         trim(&tag, &tag_end);
 
-        if (weight > dutch && is_language(tag, tag_end, "nl")) {
-            dutch = weight;
-            dutch_at = at;
-        } else if (weight > english && is_language(tag, tag_end, "en")) {
-            english = weight;
-            english_at = at;
+        bool dutch = is_language(tag, tag_end, "nl");
+        if (weight > best && (dutch || is_language(tag, tag_end, "en"))) {
+            best = weight;
+            best_is_dutch = dutch;
         }
     }
-    if (dutch <= 0) {
-        return false;
-    }
-    return dutch > english || (dutch == english && dutch_at < english_at);
+    return best_is_dutch && best > 0;
 }
 
 lang_choice_t lang_from_query(const char *query, size_t len)
 {
     static const char KEY[] = "lang=";
     const size_t key_len = sizeof(KEY) - 1;
-
-    for (size_t start = 0; query != NULL && start < len;) {
-        size_t end = start;
-        while (end < len && query[end] != '&') {
-            end++;
-        }
-        const char *param = query + start;
-        size_t param_len = end - start;
-        bool is_lang = param_len >= key_len;
-        for (size_t i = 0; is_lang && i < key_len; i++) {
-            is_lang = param[i] == KEY[i];
-        }
-        if (is_lang) {
-            const char *value = param + key_len;
-            if (param_len - key_len != 2) {
-                return LANG_UNSET;
-            }
-            if (value[0] == 'n' && value[1] == 'l') {
+    if (query == NULL) {
+        return LANG_UNSET;
+    }
+    const char *end = query + len;
+    for (const char *param = query; param < end;) {
+        const char *param_end = piece_end(param, end, '&');
+        size_t param_len = (size_t)(param_end - param);
+        if (param_len >= key_len && memcmp(param, KEY, key_len) == 0) {
+            /* The first "lang=" decides, also when it names another language. */
+            if (param_len == key_len + 2 && memcmp(param + key_len, "nl", 2) == 0) {
                 return LANG_DUTCH;
             }
-            if (value[0] == 'e' && value[1] == 'n') {
+            if (param_len == key_len + 2 && memcmp(param + key_len, "en", 2) == 0) {
                 return LANG_ENGLISH;
             }
             return LANG_UNSET;
         }
-        start = end + 1;
+        param = param_end < end ? param_end + 1 : end;
     }
     return LANG_UNSET;
 }

@@ -20,7 +20,7 @@ chip itself.
 | `wifi_creds: no WiFi configured` | going to setup mode |
 | `net: connecting to "…"` | first attempt after start-up |
 | `net: connected, ip=…, signal N dBm` | online |
-| `net: disconnected (reason N: …); retrying in N s` | an attempt failed or the connection was lost, with the reason in words where there is something to do about it (network not found, password rejected, access point stopped answering); retries after 1 s, growing to 30 s |
+| `net: disconnected (reason N: …); retrying in N s` | an attempt failed or the connection was lost, with the reason in words where there is something to do about it (network not found; sign-in failed: wrong password or weak signal; access point stopped answering). One such line followed by `connected` is normal on a weak signal. Retries after 1 s, growing to 30 s |
 | `net: connect failed: …; retrying in N s` | attempt rejected before it started; retried |
 | `net: lost IP address, reconnecting` | DHCP lease lost |
 | `setup: restarting into setup mode` | entering setup (button or recovery) |

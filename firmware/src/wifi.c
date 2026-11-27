@@ -14,24 +14,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "secrets_gen.h"
-#include "wifi_reason.h"
 
 _Static_assert(WIFI_SSID_MAX_LEN <= MAX_SSID_LEN && WIFI_PASS_MAX_LEN < MAX_PASSPHRASE_LEN,
                "wifi_form limits must fit the ESP-IDF config fields");
 _Static_assert(sizeof(SETUP_PASS) - 1 >= WIFI_PASS_MIN_LEN &&
                    sizeof(SETUP_PASS) - 1 <= WIFI_PASS_MAX_LEN,
                "setup_pass in secrets.ini must be 8-63 bytes");
-
-_Static_assert(WIFI_REASON_TEXT_AUTH_EXPIRE == WIFI_REASON_AUTH_EXPIRE &&
-                   WIFI_REASON_TEXT_ASSOC_LEAVE == WIFI_REASON_ASSOC_LEAVE &&
-                   WIFI_REASON_TEXT_4WAY_TIMEOUT == WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT &&
-                   WIFI_REASON_TEXT_BEACON_TIMEOUT == WIFI_REASON_BEACON_TIMEOUT &&
-                   WIFI_REASON_TEXT_NO_AP_FOUND == WIFI_REASON_NO_AP_FOUND &&
-                   WIFI_REASON_TEXT_AUTH_FAIL == WIFI_REASON_AUTH_FAIL &&
-                   WIFI_REASON_TEXT_ASSOC_FAIL == WIFI_REASON_ASSOC_FAIL &&
-                   WIFI_REASON_TEXT_HANDSHAKE_TIMEOUT == WIFI_REASON_HANDSHAKE_TIMEOUT &&
-                   WIFI_REASON_TEXT_CONNECTION_FAIL == WIFI_REASON_CONNECTION_FAIL,
-               "wifi_reason.h must use ESP-IDF's reason numbers");
 
 #define BACKOFF_MIN_US (1 * US_PER_S)
 #define BACKOFF_MAX_US (30 * US_PER_S)
@@ -69,8 +57,8 @@ static void connect_or_retry(void)
 {
     esp_err_t err = esp_wifi_connect();
     if (err != ESP_OK) {
-        ESP_LOGW(TAG, "connect failed: %s; retrying in %d s", esp_err_to_name(err),
-                 schedule_reconnect());
+        int retry_s = schedule_reconnect();
+        ESP_LOGW(TAG, "connect failed: %s; retrying in %d s", esp_err_to_name(err), retry_s);
     }
 }
 
@@ -96,6 +84,34 @@ static bool is_auth_failure(uint8_t reason)
     }
 }
 
+/* A few words for the reasons a user can do something about; NULL for the
+ * others, which are logged by number only. */
+static const char *reason_text(uint8_t reason)
+{
+    switch (reason) {
+    case WIFI_REASON_NO_AP_FOUND:
+        return "network not found";
+    /* A weak link fails the same way as a wrong password does, also on a
+     * single attempt that the next one makes good. */
+    case WIFI_REASON_AUTH_FAIL:
+    case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+    case WIFI_REASON_HANDSHAKE_TIMEOUT:
+        return "sign-in failed: wrong password or weak signal";
+    case WIFI_REASON_BEACON_TIMEOUT:
+        return "access point stopped answering";
+    case WIFI_REASON_ASSOC_FAIL:
+        return "access point refused the connection";
+    case WIFI_REASON_AUTH_EXPIRE:
+        return "sign-in expired";
+    case WIFI_REASON_ASSOC_LEAVE:
+        return "left the network";
+    case WIFI_REASON_CONNECTION_FAIL:
+        return "could not connect";
+    default:
+        return NULL;
+    }
+}
+
 static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
 {
     (void)arg;
@@ -109,9 +125,10 @@ static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
         } else {
             atomic_store(&s_auth_failures, 0);
         }
-        const char *why = wifi_reason_text(d->reason);
+        int retry_s = schedule_reconnect();
+        const char *why = reason_text(d->reason);
         ESP_LOGW(TAG, "disconnected (reason %d%s%s); retrying in %d s", d->reason,
-                 why != NULL ? ": " : "", why != NULL ? why : "", schedule_reconnect());
+                 why != NULL ? ": " : "", why != NULL ? why : "", retry_s);
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         const ip_event_got_ip_t *e = data;
         atomic_store(&s_connected, true);
@@ -119,7 +136,7 @@ static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
         atomic_store(&s_auth_failures, 0);
         atomic_store(&s_backoff_us, BACKOFF_MIN_US);
         int rssi = 0;
-        esp_wifi_sta_get_rssi(&rssi);
+        wifi_get_rssi(&rssi);
         ESP_LOGI(TAG, "connected, ip=" IPSTR ", signal %d dBm", IP2STR(&e->ip_info.ip), rssi);
     } else if (base == IP_EVENT && id == IP_EVENT_STA_LOST_IP) {
         atomic_store(&s_connected, false);
