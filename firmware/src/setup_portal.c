@@ -43,29 +43,17 @@
 
 static const char *TAG = LOG_TAG_SETUP;
 
-/* Pages gzipped at build time (scripts/gen_web.py), each in English and Dutch. */
+/* The setup pages of web/, gzipped, each in English and Dutch. The generated
+ * file defines one localized_page_t per page: PAGE_setup, PAGE_saved, ... */
 typedef struct {
-    const uint8_t *start;
-    const uint8_t *end;
+    const uint8_t *data;
+    size_t len;
 } page_t;
-#define EMBEDDED_PAGE(name)                                                                        \
-    extern const uint8_t name##_start[] asm("_binary_" #name "_html_gz_start");                    \
-    extern const uint8_t name##_end[] asm("_binary_" #name "_html_gz_end");                        \
-    static const page_t PAGE_##name = { name##_start, name##_end }
-EMBEDDED_PAGE(setup);
-EMBEDDED_PAGE(saved);
-EMBEDDED_PAGE(invalid);
-EMBEDDED_PAGE(setup_nl);
-EMBEDDED_PAGE(saved_nl);
-EMBEDDED_PAGE(invalid_nl);
-
 typedef struct {
-    const page_t *english;
-    const page_t *dutch;
+    page_t english;
+    page_t dutch;
 } localized_page_t;
-static const localized_page_t SETUP_PAGE = { &PAGE_setup, &PAGE_setup_nl };
-static const localized_page_t SAVED_PAGE = { &PAGE_saved, &PAGE_saved_nl };
-static const localized_page_t INVALID_PAGE = { &PAGE_invalid, &PAGE_invalid_nl };
+#include "web_pages_gen.inc"
 
 /* Carries a setup request across esp_restart() (lost on power-up/RST). */
 typedef struct {
@@ -151,10 +139,9 @@ static bool wants_dutch(httpd_req_t *req)
 
 static esp_err_t send_page(httpd_req_t *req, const char *status, const localized_page_t *pages)
 {
-    const page_t *page = wants_dutch(req) ? pages->dutch : pages->english;
+    const page_t *page = wants_dutch(req) ? &pages->dutch : &pages->english;
     httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-    return send_response(req, status, "text/html; charset=utf-8", page->start,
-                         (size_t)(page->end - page->start));
+    return send_response(req, status, "text/html; charset=utf-8", page->data, page->len);
 }
 
 static esp_err_t handle_state(httpd_req_t *req)
@@ -200,14 +187,14 @@ static esp_err_t handle_scan(httpd_req_t *req)
 
 static esp_err_t handle_form(httpd_req_t *req)
 {
-    return send_page(req, HTTPD_200, &SETUP_PAGE);
+    return send_page(req, HTTPD_200, &PAGE_setup);
 }
 
 static esp_err_t handle_save(httpd_req_t *req)
 {
     char body[MAX_FORM_BODY];
     if (req->content_len > sizeof(body)) {
-        return send_page(req, HTTPD_400, &INVALID_PAGE);
+        return send_page(req, HTTPD_400, &PAGE_invalid);
     }
     size_t received = 0;
     int timeouts = 0;
@@ -224,7 +211,7 @@ static esp_err_t handle_save(httpd_req_t *req)
 
     wifi_credentials_t creds;
     if (wifi_form_parse(body, received, &creds) != WIFI_FORM_OK) {
-        return send_page(req, HTTPD_400, &INVALID_PAGE);
+        return send_page(req, HTTPD_400, &PAGE_invalid);
     }
     esp_err_t err = wifi_credentials_save(&creds);
     if (err != ESP_OK) {
@@ -232,7 +219,7 @@ static esp_err_t handle_save(httpd_req_t *req)
         return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Saving failed");
     }
     ESP_LOGI(TAG, "saved WiFi settings for \"%s\", restarting", creds.ssid);
-    send_page(req, HTTPD_200, &SAVED_PAGE);
+    send_page(req, HTTPD_200, &PAGE_saved);
     vTaskDelay(pdMS_TO_TICKS(RESTART_AFTER_SAVE_MS)); /* let the page reach the phone */
     esp_restart();
 }
@@ -249,6 +236,14 @@ static esp_err_t handle_redirect(httpd_req_t *req)
 
 static void start_http_server(portal_t *portal)
 {
+    /* Phones that probe for internet drop connections all the time: the web
+     * server's warnings about that are not worth a line in the log. */
+    static const char *const SERVER_TAGS[] = { "httpd_txrx", "httpd_parse", "httpd_sess",
+                                               "httpd_uri" };
+    for (size_t i = 0; i < sizeof(SERVER_TAGS) / sizeof(SERVER_TAGS[0]); i++) {
+        esp_log_level_set(SERVER_TAGS[i], ESP_LOG_ERROR);
+    }
+
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.uri_match_fn = httpd_uri_match_wildcard;
     config.lru_purge_enable = true; /* phones open many probe connections */
@@ -340,9 +335,7 @@ void setup_portal_run(bool has_wifi)
     uint8_t channel;
     esp_netif_t *ap = wifi_start_setup_ap(&channel);
     ESP_ERROR_CHECK(
-        esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STACONNECTED, on_hotspot_event, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STADISCONNECTED,
-                                               on_hotspot_event, NULL));
+        esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, on_hotspot_event, NULL));
     esp_netif_ip_info_t ip;
     ESP_ERROR_CHECK(esp_netif_get_ip_info(ap, &ip));
     memcpy(portal->ip, &ip.ip.addr, sizeof(portal->ip));

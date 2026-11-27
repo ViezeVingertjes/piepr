@@ -1,5 +1,4 @@
 {
-  "en": "nl",
   "You can switch your phone back to your own WiFi. If Piepr can’t connect, Piepr-Setup returns in about 5 minutes.": "Je kunt je telefoon weer op je eigen wifi zetten. Lukt verbinden niet, dan komt Piepr-Setup na ongeveer 5 minuten terug.",
   "Find it at": "Je vindt hem op",
   ", port": ", poort",
@@ -47,7 +46,5 @@
   "Piepr: not saved": "Piepr: niet opgeslagen",
   "Not saved": "Niet opgeslagen",
   "Name: 1&ndash;32 characters. Password: 8&ndash;63 characters, or empty for an open network.": "Naam: 1&ndash;32 tekens. Wachtwoord: 8&ndash;63 tekens, of leeg bij een open netwerk.",
-  "Back to setup": "Terug naar instellen",
-  "nl": "en",
-  "Nederlands": "English"
+  "Back to setup": "Terug naar instellen"
 }

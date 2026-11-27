@@ -5,5 +5,5 @@ sdkconfig.*
 managed_components/
 src/secrets_gen.h
 src/version_gen.h
-web/gz/
+src/web_pages_gen.inc
 .vscode/

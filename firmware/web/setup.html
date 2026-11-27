@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="[[en]]">
+<html lang="[[@lang]]">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>[[Piepr: WiFi setup]]</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23ffc21a'/%3E%3Cpath d='M20 52V28M45 28a12.5 12.5 0 1 1-25 0a12.5 12.5 0 1 1 25 0' fill='none' stroke='%230e2236' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='32.5' cy='28' r='4.5' fill='%23ff4b3e'/%3E%3C/svg%3E">
+[[>favicon]]
 <style>
 :root{--bg:#e9eef3;--card:#fff;--ink:#0e2236;--muted:#55657a;--line:#d3dbe3;--act:#0e2236;--on-act:#fff;--sel:#ffc21a;--err:#b3261e;--warn:#fff3c4}
 @media (prefers-color-scheme:dark){:root{--bg:#0b1a2a;--card:#12263b;--ink:#e9eef3;--muted:#93a3b5;--line:#22394f;--act:#ffc21a;--on-act:#0e2236;--err:#ff8a80;--warn:#3a3112}}
@@ -62,11 +62,11 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
 </head>
 <body>
 <main>
-<div class="top"><svg class="brand" viewBox="0 -2 215 90" role="img" aria-label="Piepr"><path fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" d="M5.5 82V40M45.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M63 26V60M78 40H118A20 20 0 1 0 112.1 54.1M133.5 82V40M173.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M188.5 60V40A20 20 0 0 1 208.5 20"/><circle cx="63" cy="6" r="7" fill="#ff4b3e"/></svg><a class="lang" href="/?lang=[[nl]]" lang="[[nl]]">[[Nederlands]]</a></div>
+<div class="top">[[>brand]]<a class="lang" href="/?lang=[[@other]]" lang="[[@other]]">[[@other-name]]</a></div>
 <h1>[[Connect Piepr to WiFi]]</h1>
 <div class="meter js-only" aria-hidden="true"><i></i><i></i><i></i></div>
 <p class="banner" id="banner" role="alert" hidden></p>
-<form method="post" action="/save?lang=[[en]]" id="form" novalidate>
+<form method="post" action="/save?lang=[[@lang]]" id="form" novalidate>
 <section id="step-network">
   <div class="head"><h2 tabindex="-1">[[Choose your network]]</h2><button type="button" class="rescan js-only" id="rescan" aria-label="[[Scan again]]"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8.7"/><path d="M20 3.7v5h-5"/></svg></button></div>
   <p class="hint js-only" id="scan-status" role="status"></p>
@@ -100,8 +100,7 @@ html:not(.js) .js-only,.js .no-js,.js section:not(.current){display:none}
 <section id="step-done" class="js-only">
   <h2 tabindex="-1">[[Saved]]</h2>
   <p>[[Piepr is joining]] <strong id="done-ssid"></strong>[[. When its light stays on, it’s connected.]]</p>
-  <p class="muted">[[You can switch your phone back to your own WiFi. If Piepr can’t connect, Piepr-Setup returns in about 5 minutes.]]</p>
-  <p class="muted">[[Find it at]] <b>piepr.local</b>[[, port]] <b>8088</b>.</p>
+  [[>after-save]]
 </section>
 </form>
 </main>
