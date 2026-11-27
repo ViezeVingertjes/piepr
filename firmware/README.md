@@ -34,8 +34,8 @@ Then set up WiFi from your phone (below).
 
 Reading it: any DSMR software that connects over TCP, at host `piepr.local`,
 port `8088`. Home Assistant: Settings → Devices & services → Add integration →
-*DSMR Smart Meter* → *Network*; DSMR version 5 for most meters from 2016 on,
-4 for older ones, 5B in Belgium. If `.local` doesn't resolve, use the IP of
+*DSMR Smart Meter* → *Network*; DSMR version 4 or 5, usually printed
+on the front of the meter; 5B in Belgium. If `.local` doesn't resolve, use the IP of
 `piepr` from your router's device list (or the log line `wifi: connected, ip=…`).
 
 ## WiFi setup (phone)
@@ -46,7 +46,7 @@ you save one. To change the network later: **hold BOOT until the LED double-blin
 1. Join **`Piepr-Setup`** with **piepr1234** (release firmware) or your own `setup_pass`. The page opens
    by itself (or browse to `http://192.168.4.1`, Piepr's own address on that hotspot).
 2. Pick your network from the list (the strongest usable ones, after a scan of about
-   8 s; ↻ scans again). 2.4 GHz only. Use *Other network…* for hidden or weak ones.
+   10 s; ↻ scans again). 2.4 GHz only. Use *Other network…* for hidden or weak ones.
 3. Enter the password (shown while typing; skipped for open networks).
 4. Save. The device restarts and joins.
 
@@ -54,7 +54,8 @@ The page works offline (gzipped in flash, about 5 KB). Name 1–32 bytes, passwo
 empty or 8–63 bytes; checked on the page and again on the device. Without
 JavaScript, or on old browsers, it falls back to a plain form.
 
-To leave without saving: press RST, or wait 10 minutes without page activity.
+To leave without saving (only when a network was saved before): press RST, or wait
+10 minutes without page activity.
 
 Android: if the page doesn't open on a phone that joined the hotspot before,
 *forget* `Piepr-Setup` once and join again.
@@ -108,7 +109,7 @@ constants `UPPER_CASE`. Format with `.clang-format`
 ## LED (GPIO8)
 | LED | Meaning |
 |---|---|
-| slow blink (2 Hz) | no WiFi / no IP |
+| even blink (2 Hz) | no WiFi / no IP |
 | double blink (once a second) | setup mode |
 | on | connected |
 | brief flicker | valid telegram |
@@ -130,7 +131,7 @@ The log lines are explained in the [log reference](docs/log-reference.md).
 |---|---|
 | `ok 0`, uart errors 0 | pin 2 (Data Request) at 5 V? cable seated? |
 | `crc` / `uart errors` high | 2.2 kΩ pull-up to 3V3; data wire on GPIO4 |
-| LED keeps blinking slowly | WiFi details; weak signal (RSSI). Setup appears after 5 min |
+| LED keeps blinking evenly | WiFi details; weak signal (RSSI). Setup appears after 5 min |
 | Network missing from the setup list | 5 GHz only, weak signal, hidden SSID (use *Other network…*), or a non-UTF-8 name (rename it) |
 | Setup page doesn't open | forget `Piepr-Setup` on the phone and rejoin, or browse to `http://192.168.4.1` |
 | Build fails: `setup_pass … must be 8-63 bytes` | set `setup_pass` in `secrets.ini` |

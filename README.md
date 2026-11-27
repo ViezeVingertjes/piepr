@@ -19,7 +19,8 @@ available on your own network. No app, no account, no cloud.
   reads P1 data: Home Assistant (DSMR Smart Meter), Domoticz (P1 Smart Meter with LAN
   interface), DSMR-reader, or your own script; up to 5 at the same time
 - WiFi setup from your phone, with a list of nearby networks
-- Recovers by itself: if WiFi fails, the setup hotspot comes back and says why
+- Recovers by itself: when it can't join your WiFi, the setup hotspot comes back and
+  says why
 - About €16 delivered for your first one (about €5.40 in parts each): an ESP32-C3
   SuperMini, an RJ12 cable, a resistor and a diode
 
@@ -39,7 +40,7 @@ available on your own network. No app, no account, no cloud.
 4. When the light **stays on**, Piepr is connected.
 5. Point your software at `piepr.local`, port `8088`. In Home Assistant: Settings →
    Devices & services → Add integration → DSMR Smart Meter → Network. DSMR version:
-   5 for most meters from 2016 on, 4 for older ones, 5B in Belgium.
+   4 or 5, usually printed on the front of the meter; 5B in Belgium.
 
 To change the WiFi later, hold the **BOOT** button until the light double-blinks
 (about 5 seconds).
@@ -47,8 +48,8 @@ To change the WiFi later, hold the **BOOT** button until the light double-blinks
 | Light | Meaning |
 |---|---|
 | on, with a short flicker per reading | connected and reading the meter |
-| slow blink | looking for WiFi |
-| double blink | setup mode: join Piepr-Setup |
+| blinks evenly | looking for WiFi |
+| double blink, then a pause | setup mode: join Piepr-Setup |
 
 | Problem | What to do |
 |---|---|

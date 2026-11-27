@@ -35,7 +35,7 @@ body:
     id: header
     attributes:
       label: First line of a telegram
-      description: The line starting with "/", from "nc piepr.local 8088". It names the meter type and holds nothing personal.
+      description: The line starting with "/", from "nc piepr.local 8088". It names the meter type.
       placeholder: /XMX5LGBBFG1009394887
   - type: textarea
     id: notes

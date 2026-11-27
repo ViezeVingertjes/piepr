@@ -22,7 +22,7 @@ always works.
 | Resistor **2.2 kΩ**, 1/4 W (1–4.7 kΩ works) | [100, variant 2.2K](https://www.aliexpress.com/item/1005005669886834.html) | €2.40 | €0.02 | `2.2K 1/4W resistor` |
 | Heat shrink, 2 mm and 3 mm | [kit of 127](https://www.aliexpress.com/item/1005008123196951.html) | €1.99 | €0.05 | `heat shrink kit` |
 | Schottky diode **1N5819** (DO-41) | [100](https://www.aliexpress.com/item/32886942865.html) | €1.18 + €3.53 shipping | €0.01 | `1N5819 DO-41` |
-| Total | | €15.85 | €5.36 | |
+| Total | | €15.85 | €5.35 | |
 | USB-C cable (USB-A to C) + 5 V USB charger | most people have these | | | `5V USB charger` |
 | Optional: 470–1000 µF capacitor | only if a DSMR 5 meter powers the board | | | `1000uF 10V capacitor` |
 
@@ -40,7 +40,7 @@ Board top view, **USB-C up**: the right-hand row is
 
 | P1 pin | Function | Inline part | → Board pad |
 |---|---|---|---|
-| 1 | +5 V (DSMR 5 only; 0 V on DSMR 4) | **1N5819**, stripe → board | 5V |
+| 1 | +5 V from the meter (up to 250 mA on DSMR 5, 100 mA on DSMR 4) | **1N5819**, stripe → board | 5V |
 | 2 | Data Request (must be high) | | 5V |
 | 3 | Data GND | | G |
 | 4 | not used | | cut short, insulate |
@@ -70,7 +70,8 @@ multimeter in beep mode, find which loose wire belongs to each contact.
 
 ### Step 2 (optional): Measure at the meter
 Plug into the meter with the loose ends apart. DC volts:
-- pin 1 vs pin 6: 0 V on DSMR 4, ~5 V on DSMR 5.
+- pin 1 vs pin 6: ~5 V. If a DSMR 4 meter shows 0 V here, carry on: the board runs
+  from USB.
 - pin 5 vs pin 3: ~0 V (normal without pull-up).
 
 Unplug before soldering.
@@ -114,7 +115,7 @@ Flash the latest release from your browser, or build your own; see the
 2. Power the board from a USB charger and set up WiFi from your phone (see
    [Using Piepr](../README.md#using-piepr)).
 3. Telegrams arrive every 10 s (DSMR 4) or every second (DSMR 5). Gas updates
-   hourly; *returned energy* stays 0 without solar panels.
+   hourly (DSMR 4) or every 5 minutes (DSMR 5); *returned energy* stays 0 without solar panels.
 
 ### Changing WiFi later
 Hold **BOOT** until the light double-blinks (about 5 s); Piepr restarts as hotspot
@@ -129,7 +130,7 @@ the [firmware guide](../firmware/README.md).
 |---|---|
 | No data | pin 2 not at 5 V; wrong wire on pad 4; pull-up missing; colour mix-up (redo step 1) |
 | `crc` / `uart errors` high in the log | check the 2.2 kΩ pull-up and the data wire on pad 4 |
-| WiFi drops (RSSI worse than −80 dBm) | small antenna: add a 31 mm wire antenna, or an access point closer to the meter |
+| WiFi drops (RSSI worse than −80 dBm) | the signal at the meter is too weak: put an access point closer, or solder a 31 mm wire to the board's antenna |
 | Board not seen over USB | data-capable cable? `dialout` group? Hold BOOT, tap RST, release BOOT |
 | Random resets | weak charger; if a DSMR 5 meter powers the board, add 470–1000 µF across 5V and G |
 

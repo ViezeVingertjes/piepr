@@ -19,7 +19,8 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
   die P1-data leest: Home Assistant (DSMR Smart Meter), Domoticz (P1 Smart Meter with
   LAN interface), DSMR-reader of je eigen script; tot 5 tegelijk
 - Wifi stel je in op je telefoon: je kiest uit een lijst met netwerken in de buurt
-- Herstelt zichzelf: lukt wifi niet, dan komt de setup-hotspot terug en zie je waarom
+- Herstelt zichzelf: komt hij niet op je wifi, dan komt de setup-hotspot terug en zie
+  je waarom
 - Ongeveer €16 inclusief verzending voor je eerste (ongeveer €5,40 aan onderdelen
   per stuk): een ESP32-C3 SuperMini, een RJ12-kabel, een weerstand en een diode
 
@@ -40,7 +41,7 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
 4. Als het lampje **blijft branden**, is Piepr verbonden.
 5. Vul in je software `piepr.local` in, met poort `8088`. In Home Assistant:
    Instellingen → Apparaten & diensten → Integratie toevoegen → DSMR Smart Meter →
-   Netwerk. DSMR-versie: 5 voor de meeste meters vanaf 2016, 4 voor oudere, 5B in
+   Netwerk. DSMR-versie: 4 of 5, staat meestal op de voorkant van de meter; 5B in
    België.
 
 Later een ander wifi-netwerk instellen? Houd de **BOOT**-knop ingedrukt tot het lampje
@@ -49,8 +50,8 @@ dubbel knippert (ongeveer 5 seconden).
 | Lampje | Betekenis |
 |---|---|
 | aan, met een korte flikkering per meting | verbonden en leest de meter |
-| knippert langzaam | zoekt wifi |
-| knippert dubbel | instelmodus: verbind met Piepr-Setup |
+| knippert gelijkmatig | zoekt wifi |
+| knippert dubbel, dan een pauze | instelmodus: verbind met Piepr-Setup |
 
 | Probleem | Wat je doet |
 |---|---|

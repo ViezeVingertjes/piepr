@@ -25,7 +25,7 @@ de zoekterm werkt altijd.
 | Weerstand **2,2 kΩ**, 1/4 W (1–4,7 kΩ werkt ook) | [100 stuks, variant 2.2K](https://www.aliexpress.com/item/1005005669886834.html) | €2,40 | €0,02 | `2.2K 1/4W resistor` |
 | Krimpkous, 2 mm en 3 mm | [set van 127](https://www.aliexpress.com/item/1005008123196951.html) | €1,99 | €0,05 | `heat shrink kit` |
 | Schottky-diode **1N5819** (DO-41) | [100 stuks](https://www.aliexpress.com/item/32886942865.html) | €1,18 + €3,53 verzending | €0,01 | `1N5819 DO-41` |
-| Totaal | | €15,85 | €5,36 | |
+| Totaal | | €15,85 | €5,35 | |
 | USB-C-kabel (USB-A naar C) + USB-lader van 5 V | heeft bijna iedereen liggen | | | `5V USB charger` |
 | Optioneel: condensator van 470–1000 µF | alleen als een DSMR 5-meter het bordje voedt | | | `1000uF 10V capacitor` |
 
@@ -44,7 +44,7 @@ Bordje van boven gezien, **USB-C naar boven**: de rechterrij is
 
 | P1-pin | Functie | Onderdeel ertussen | → Soldeervlakje |
 |---|---|---|---|
-| 1 | +5 V (alleen DSMR 5; 0 V bij DSMR 4) | **1N5819**, streepje → bordje | 5V |
+| 1 | +5 V uit de meter (tot 250 mA bij DSMR 5, 100 mA bij DSMR 4) | **1N5819**, streepje → bordje | 5V |
 | 2 | Data Request (moet hoog zijn) | | 5V |
 | 3 | Data-GND | | G |
 | 4 | niet gebruikt | | kort afknippen, isoleren |
@@ -76,7 +76,8 @@ draad die erbij hoort.
 
 ### Stap 2 (optioneel): Meten aan de meter
 Steek de stekker in de meter en houd de losse draadeinden uit elkaar. Gelijkspanning:
-- pin 1 tegen pin 6: 0 V bij DSMR 4, ~5 V bij DSMR 5.
+- pin 1 tegen pin 6: ~5 V. Meet je bij een DSMR 4-meter 0 V, ga dan gewoon door: het
+  bordje krijgt stroom via USB.
 - pin 5 tegen pin 3: ~0 V (normaal zonder pull-up).
 
 Haal de stekker eruit voordat je gaat solderen.
@@ -121,7 +122,7 @@ Flash de nieuwste release vanuit je browser, of bouw hem zelf; zie de
 2. Sluit het bordje aan op een USB-lader en stel wifi in op je telefoon (zie
    [Piepr gebruiken](../README.nl.md#piepr-gebruiken)).
 3. Er komt elke 10 s een telegram (DSMR 4) of elke seconde (DSMR 5). Gas wordt elk
-   uur bijgewerkt; *teruggeleverde energie* blijft 0 zonder zonnepanelen.
+   uur bijgewerkt (DSMR 4) of elke 5 minuten (DSMR 5); *teruggeleverde energie* blijft 0 zonder zonnepanelen.
 
 ### Later een ander wifi-netwerk
 Houd **BOOT** ingedrukt tot het lampje dubbel knippert (ongeveer 5 s); Piepr start
@@ -136,7 +137,7 @@ de [firmwaregids](../firmware/README.md) (Engels).
 |---|---|
 | Geen data | pin 2 staat niet op 5 V; verkeerde draad op vlakje 4; pull-up ontbreekt; kleuren verwisseld (doe stap 1 opnieuw) |
 | `crc` / `uart errors` hoog in het log | controleer de pull-up van 2,2 kΩ en de datadraad op vlakje 4 |
-| Wifi valt weg (RSSI slechter dan −80 dBm) | kleine antenne: soldeer er een draadantenne van 31 mm aan, of zet een accesspoint dichter bij de meter |
+| Wifi valt weg (RSSI slechter dan −80 dBm) | het signaal bij de meter is te zwak: zet een accesspoint dichterbij, of soldeer een draad van 31 mm aan de antenne van het bordje |
 | Bordje verschijnt niet via USB | kabel met datalijnen? groep `dialout`? Houd BOOT ingedrukt, druk kort op RST, laat BOOT los |
 | Herstart zomaar | zwakke lader; voedt een DSMR 5-meter het bordje, zet dan 470–1000 µF tussen 5V en G |
 

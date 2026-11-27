@@ -23,7 +23,7 @@ clang-format -i src/*.[ch] lib/*/*/*.[ch] test/*/*.c fuzz/*.c
 ```
 
 Use clang-format 22.1.5 (`pip install clang-format==22.1.5`): other versions
-lay the code out differently and the build check will complain.
+lay the code out differently and the formatting check fails.
 
 Outside `firmware/`:
 
