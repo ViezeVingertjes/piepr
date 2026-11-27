@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install platformio==6.2.0
+      - run: pio test -e native
+        working-directory: firmware
+
+  format:
+    name: Formatting
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      # Other clang-format versions lay the code out differently.
+      - run: pip install clang-format==22.1.5
+      - run: clang-format --dry-run -Werror src/*.[ch] lib/*/*/*.[ch] test/*/*.c fuzz/*.c
+        working-directory: firmware
+
+  firmware:
+    name: Firmware build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the version string comes from git describe
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v6
+        with:
+          path: ~/.platformio
+          key: pio-${{ hashFiles('firmware/platformio.ini', 'firmware/dependencies.lock') }}
+      - run: pip install platformio==6.2.0
+      # The setup password of the release firmware; it is public.
+      - run: printf '[secrets]\nsetup_pass = piepr1234\n' > firmware/secrets.ini
+      - run: pio run
+        working-directory: firmware
+      - uses: actions/upload-artifact@v7
+        with:
+          name: firmware
+          path: firmware/.pio/build/supermini/firmware.bin
+
+  fuzz:
+    name: Fuzz (${{ matrix.target }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [p1_framer, wifi_form, captive_dns, json_escape]
+    steps:
+      - uses: actions/checkout@v7
+      - run: firmware/fuzz/run.sh ${{ matrix.target }} 60
