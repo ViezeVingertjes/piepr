@@ -80,6 +80,7 @@ meter? Maak een [metermelding](https://github.com/ViezeVingertjes/piepr/issues/n
 | [`hardware/`](hardware) | Bouwgids en bedradingsschema's |
 | [`firmware/`](firmware) | ESP-IDF-firmware, tests en fuzzers |
 | [`assets/`](assets) | Logo en afbeeldingen |
+| [`tools/`](tools) | Een [nepmeter](firmware/docs/simulator.md) om mee te testen (Engels), en het script voor de afbeeldingen |
 
 ## Licentie
 

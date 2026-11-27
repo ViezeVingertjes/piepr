@@ -140,4 +140,5 @@ The log lines are explained in the [log reference](docs/log-reference.md).
 ## More
 - [Log reference](docs/log-reference.md): every log line and what it means
 - [How Piepr stays up](docs/internals.md): the rules the firmware keeps to
+- [Testing without a meter](docs/simulator.md): a pretend meter for your desk
 - [Security](../SECURITY.md): what is protected and what is not

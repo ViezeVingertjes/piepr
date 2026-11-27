@@ -79,6 +79,7 @@ meter? Open a [meter report](https://github.com/ViezeVingertjes/piepr/issues/new
 | [`hardware/`](hardware) | Build guide and wiring diagrams |
 | [`firmware/`](firmware) | ESP-IDF firmware, tests and fuzzers |
 | [`assets/`](assets) | Logo and images |
+| [`tools/`](tools) | A [pretend meter](firmware/docs/simulator.md) for testing, and the image script |
 
 ## License
 

@@ -25,5 +25,15 @@ clang-format -i src/*.[ch] lib/*/*/*.[ch] test/*/*.c fuzz/*.c
 Use clang-format 22.1.5 (`pip install clang-format==22.1.5`): other versions
 lay the code out differently and the build check will complain.
 
+Outside `firmware/`:
+
+```bash
+python3 -m unittest discover -s tools   # tests of the pretend meter
+tools/render_images.sh                  # after editing an image in a src/ folder (Linux)
+```
+
+The images are edited in `assets/src/` and `hardware/src/`; the script turns their
+text into outlines, so they look the same on a machine without the Ubuntu font.
+
 A change to the parsing code in `lib/` comes with a test. The same checks run
 on every pull request.
