@@ -134,6 +134,5 @@ the [firmware guide](../firmware/README.md).
 - Never a plain wire between 3.3 and 4: only the resistor.
 - Board pins are 3.3 V only: P1 data (pin 5) never goes to 5 V.
 
-## Sources
-- DSMR P1 pinout: DSMR P1 Companion Standard (Netbeheer Nederland); [jensd.be](https://jensd.be/?p=1183)
-- SuperMini pinout: [espboards.dev](https://www.espboards.dev/esp32/esp32-c3-super-mini/), [lastminuteengineers.com](https://lastminuteengineers.com/esp32-c3-super-mini-pinout-reference/)
+## Reference
+P1 port pinout and signals: *DSMR P1 Companion Standard* (Netbeheer Nederland).
