@@ -8,7 +8,7 @@
   <a href="LICENSE"><img alt="Licentie: MIT" src="https://img.shields.io/badge/license-MIT-FFC21A?labelColor=0E2236"></a>
 </p>
 
-<p align="center">Nederlands · <a href="README.md">English</a></p>
+<p align="center"><a href="https://piepr.nl">piepr.nl</a> · Nederlands · <a href="README.md">English</a></p>
 
 **Piepr** is een kleine open-source uitlezer voor Nederlandse en Belgische slimme
 meters. Steek hem in de P1-poort van je meter, zet hem met je telefoon op wifi, en
@@ -33,7 +33,8 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
 2. Zodra het lampje **dubbel knippert**, verbind je je telefoon met het wifi-netwerk
    **Piepr-Setup**. Het wachtwoord is **piepr1234**, of je eigen `setup_pass` als je
    de firmware zelf hebt gebouwd. De instelpagina opent vanzelf (zo niet, ga dan naar
-   `http://192.168.4.1`). De pagina is in het Engels.
+   `http://192.168.4.1` terwijl je telefoon op Piepr-Setup zit). De pagina is in het
+   Engels.
 3. Kies je thuisnetwerk, vul het wachtwoord in en sla op. Piepr werkt alleen met
    **2,4 GHz**-wifi.
 4. Als het lampje **blijft branden**, is Piepr verbonden.

@@ -8,7 +8,7 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-FFC21A?labelColor=0E2236"></a>
 </p>
 
-<p align="center"><a href="README.nl.md">Nederlands</a> · English</p>
+<p align="center"><a href="https://piepr.nl/en/">piepr.nl</a> · <a href="README.nl.md">Nederlands</a> · English</p>
 
 **Piepr** is a small open-source reader for Dutch and Belgian smart meters. Plug it
 into the meter's P1 port, connect it to WiFi from your phone, and every reading is
@@ -33,7 +33,7 @@ available on your own network. No app, no account, no cloud.
 2. When the light **double-blinks**, join the WiFi network **Piepr-Setup** on your
    phone. The password is **piepr1234**, or your own `setup_pass` if you built the
    firmware yourself. The setup page opens by itself (otherwise browse to
-   `http://192.168.4.1`).
+   `http://192.168.4.1` while your phone is on Piepr-Setup).
 3. Pick your home network, enter its password and save. Piepr works with
    **2.4 GHz** WiFi only.
 4. When the light **stays on**, Piepr is connected.

@@ -44,7 +44,7 @@ you save one. To change the network later: **hold BOOT until the LED double-blin
 (about 5 s; not RST, and not during power-up).
 
 1. Join **`Piepr-Setup`** with **piepr1234** (release firmware) or your own `setup_pass`. The page opens
-   by itself (or browse to `http://192.168.4.1`).
+   by itself (or browse to `http://192.168.4.1`, Piepr's own address on that hotspot).
 2. Pick your network from the list (the strongest usable ones, after a scan of about
    8 s; ↻ scans again). 2.4 GHz only. Use *Other network…* for hidden or weak ones.
 3. Enter the password (shown while typing; skipped for open networks).
