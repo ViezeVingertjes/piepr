@@ -23,6 +23,8 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
   je waarom
 - Ongeveer €5 aan onderdelen: een ESP32-C3 SuperMini, een RJ12-kabel, een weerstand en
   een diode
+- Met de hand bedraad, of op een kleine [printplaat](hardware/pcb) die je kunt laten
+  maken
 
 <p align="center">
   <img src="assets/setup-flow.nl.png" alt="Wifi instellen op een telefoon: netwerk kiezen, wachtwoord invullen, opgeslagen" width="820">
@@ -76,11 +78,12 @@ meter? Maak een [metermelding](https://github.com/ViezeVingertjes/piepr/issues/n
 
 | Map | Inhoud |
 |---|---|
-| [`hardware/`](hardware) | Bouwgids en bedradingsschema's |
+| [`hardware/`](hardware) | Bouwgids, bedradingsschema's en de [printplaat](hardware/pcb) |
 | [`firmware/`](firmware) | ESP-IDF-firmware, tests en fuzzers |
 | [`assets/`](assets) | Logo en afbeeldingen |
 | [`tools/`](tools) | Een [nepmeter](firmware/docs/simulator.md) om mee te testen (Engels), en het script voor de afbeeldingen |
 
 ## Licentie
 
-MIT, zie [LICENSE](LICENSE).
+MIT, zie [LICENSE](LICENSE). De printplaat in [`hardware/pcb`](hardware/pcb) valt onder de
+CERN Open Hardware Licence v2, Permissive.

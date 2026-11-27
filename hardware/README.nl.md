@@ -7,6 +7,10 @@ avond met een soldeerbout en een multimeter.
 
 ![Bedradingsschema](wiring-diagram.nl.svg)
 
+Liever geen draden knippen en uitzoeken? Er is ook een kleine [printplaat](pcb) voor
+dezelfde onderdelen, met een aansluiting voor een gewone RJ12-kabel (beschrijving in
+het Engels).
+
 ## 1. Onderdelen
 
 In één Piepr zit voor ongeveer €5,35 aan onderdelen. Weerstanden, diodes en krimpkous

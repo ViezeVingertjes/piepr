@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- A circuit board for the same parts, with an RJ12 socket: [hardware/pcb](hardware/pcb)
+
 ## 1.2.1 - 2026-11-27
 
 - Switching language on the setup page keeps the step you were on, the network list

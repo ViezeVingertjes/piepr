@@ -7,6 +7,9 @@ evening with a soldering iron and a multimeter.
 
 ![Wiring diagram](wiring-diagram.svg)
 
+Rather not cut and match wires? There is also a small [circuit board](pcb) for the
+same parts, with a socket for an ordinary RJ12 cable.
+
 ## 1. Parts
 
 The parts in one Piepr cost about €5.35. Resistors, diodes and heat shrink are sold

@@ -1,0 +1,34 @@
+(version 1)
+#----------------------------------------------------------------------------------------------------
+# Design rules for AISLER's 2-layer 1.6 mm HASL boards.
+# The first three rules are AISLER's own (github.com/AislerHQ/aisler-support, kicad/
+# aisler-2-layer-simple-drc); the last one adds the annular ring from their design-rules page,
+# which the project's board setup cannot express for through-hole pads.
+#----------------------------------------------------------------------------------------------------
+
+(rule "Max Drill Hole Size PTH"
+    (constraint hole_size (max 5.6mm))
+    (condition "A.Pad_Type == 'Through-hole'"))
+
+(rule "Disallow buried via"
+    (constraint disallow buried_via))
+
+(rule "Disallow micro via"
+    (constraint disallow micro_via))
+
+(rule "Disallow solder mask margin overrides"
+    (constraint assertion "A.Soldermask_Margin_Override == 0mm || A.Soldermask_Margin_Override == null")
+    (condition "A.Type == 'Pad'"))
+
+(rule "Annular ring of plated through holes"
+    (constraint annular_width (min 0.3mm))
+    (condition "A.Pad_Type == 'Through-hole'"))
+
+(rule "Smallest plated through hole"
+    (constraint hole_size (min 0.5mm))
+    (condition "A.Pad_Type == 'Through-hole'"))
+
+# The ground fill stays half a millimetre from the board edge, also after a refill.
+(rule "Ground fill back from the edge"
+    (constraint edge_clearance (min 0.5mm))
+    (condition "A.Type == 'Zone'"))

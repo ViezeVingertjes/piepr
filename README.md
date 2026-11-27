@@ -22,6 +22,7 @@ available on your own network. No app, no account, no cloud.
 - Recovers by itself: when it can't join your WiFi, the setup hotspot comes back and
   says why
 - About €5 in parts: an ESP32-C3 SuperMini, an RJ12 cable, a resistor and a diode
+- Wired by hand, or on a small [circuit board](hardware/pcb) you can have made
 
 <p align="center">
   <img src="assets/setup-flow.png" alt="Setting up WiFi from a phone: pick a network, enter the password, saved" width="820">
@@ -74,11 +75,12 @@ meter? Open a [meter report](https://github.com/ViezeVingertjes/piepr/issues/new
 
 | Folder | Contents |
 |---|---|
-| [`hardware/`](hardware) | Build guide and wiring diagrams |
+| [`hardware/`](hardware) | Build guide, wiring diagrams and the [circuit board](hardware/pcb) |
 | [`firmware/`](firmware) | ESP-IDF firmware, tests and fuzzers |
 | [`assets/`](assets) | Logo and images |
 | [`tools/`](tools) | A [pretend meter](firmware/docs/simulator.md) for testing, and the image script |
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE). The circuit board in [`hardware/pcb`](hardware/pcb) is under the
+CERN Open Hardware Licence v2, Permissive.
