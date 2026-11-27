@@ -1,10 +1,15 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 - 2026-11-27
 
-No change in what the firmware does. Around it: automated builds and tests,
-release images built from tags, a Dutch README and build guide, and a P1
-simulator. The setup page gets the new tab icon with the next release.
+- The setup page is in Dutch on a phone set to Dutch, and in English otherwise
+- Room for two firmware versions on the board, as groundwork for updates without
+  a USB cable. Because of this, 1.1.0 itself is installed over USB like before,
+  which clears the saved WiFi network: set it up again from your phone
+- New tab icon on the setup page
+
+Around the firmware: automated builds and tests, release images built from tags,
+a Dutch README and build guide, and a P1 simulator.
 
 ## 1.0.0 - 2026-11-27
 
