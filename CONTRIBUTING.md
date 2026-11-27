@@ -19,17 +19,18 @@ the layout and the conventions.
 pio test -e native            # unit tests, with sanitizers
 pio run                       # build (needs secrets.ini, see the guide)
 fuzz/run.sh p1_framer 60      # one fuzzer for a minute (needs clang)
-clang-format -i src/*.[ch] lib/*/*/*.[ch] test/*/*.c fuzz/*.c
+scripts/format.sh             # format the C code (--check only reports)
 ```
 
-Use clang-format 22.1.5 (`pip install clang-format==22.1.5`): other versions
-lay the code out differently and the formatting check fails.
+`format.sh` needs clang-format 22.1.5 (`pip install clang-format==22.1.5`): other
+versions lay the code out differently.
 
 Outside `firmware/`:
 
 ```bash
-python3 -m unittest discover -s tools   # tests of the pretend meter
-tools/render_images.sh                  # after editing an image in a src/ folder (Linux)
+python3 -m unittest discover -s tools              # tests of the pretend meter
+python3 -m unittest discover -s firmware/scripts   # tests of the page build step
+tools/render_images.sh                             # after editing an image in a src/ folder (Linux)
 ```
 
 The images are edited in `assets/src/` and `hardware/src/`; the script turns their

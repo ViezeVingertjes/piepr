@@ -1,4 +1,4 @@
-# C style for this project. Apply with: clang-format -i src/*.[ch] lib/*/*/*.[ch] test/*/*.c fuzz/*.c
+# C style for this project. Apply with scripts/format.sh
 BasedOnStyle: LLVM
 IndentWidth: 4
 ColumnLimit: 100

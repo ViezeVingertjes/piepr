@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Builds and runs one libFuzzer target against lib/p1core + lib/portalcore.
-#   fuzz/run.sh <p1_framer|wifi_form|captive_dns|json_escape|lang_pick> [seconds=30]
+#   fuzz/run.sh <target> [seconds=30]     a target is a fuzz_<target>.c file here
 # Needs clang. Findings (crash-*/leak-*) are written to fuzz/build/.
 set -euo pipefail
 
-target="${1:?usage: fuzz/run.sh <p1_framer|wifi_form|captive_dns|json_escape|lang_pick> [seconds]}"
-seconds="${2:-30}"
 here="$(cd "$(dirname "$0")" && pwd)"
+targets="$(cd "$here" && ls fuzz_*.c | sed -e 's/^fuzz_//' -e 's/\.c$//' | tr '\n' ' ')"
+target="${1:?usage: fuzz/run.sh <target> [seconds]; targets: $targets}"
+[ -f "$here/fuzz_$target.c" ] || { echo "no such target: $target (targets: $targets)" >&2; exit 1; }
+seconds="${2:-30}"
 root="$(dirname "$here")"
 build="$here/build"
 corpus="$build/corpus/$target"

@@ -7,7 +7,14 @@ import unittest
 
 import p1sim
 
-SEED = pathlib.Path(__file__).parent.parent / "firmware/fuzz/seeds/p1_framer/v5_telegram"
+FIRMWARE = pathlib.Path(__file__).parent.parent / "firmware"
+SEED = FIRMWARE / "fuzz/seeds/p1_framer/v5_telegram"
+
+
+def firmware_constant(header: str, name: str) -> int:
+    """The value of `#define name <number>` in one of the firmware's headers."""
+    text = (FIRMWARE / header).read_text(encoding="utf-8")
+    return int(re.search(rf"^#define\s+{name}\s+(\d+)", text, re.M).group(1))
 
 
 def frame_ok(t: bytes) -> bool:
@@ -89,7 +96,11 @@ class P1Sim(unittest.TestCase):
         self.assertEqual(len(server.readers), 1)
 
     def test_fits_the_firmware_buffer(self):
-        self.assertLess(len(p1sim.telegram(5, 0)), 4096)
+        limit = firmware_constant("lib/p1core/include/p1_framer.h", "P1_MAX_TELEGRAM")
+        self.assertLess(len(p1sim.telegram(5, 0)), limit)
+
+    def test_serves_on_the_port_piepr_uses(self):
+        self.assertEqual(p1sim.DEFAULT_PORT, firmware_constant("src/config.h", "TCP_PORT"))
 
     def test_no_slash_in_body(self):
         # Piepr's framer starts a new telegram at every '/'.

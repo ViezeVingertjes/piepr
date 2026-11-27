@@ -1,9 +1,12 @@
 name: CI
 
+# Documentation and images don't change what gets built or tested.
 on:
   push:
     branches: [main]
+    paths-ignore: ["**.md", "assets/**", "hardware/**", "firmware/docs/**"]
   pull_request:
+    paths-ignore: ["**.md", "assets/**", "hardware/**", "firmware/docs/**"]
 
 permissions:
   contents: read
@@ -14,7 +17,7 @@ concurrency:
 
 jobs:
   test:
-    name: Unit tests
+    name: Tests
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -23,8 +26,13 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install platformio==6.2.0
-      - run: pio test -e native
+      - name: Firmware libraries
+        run: pio test -e native
         working-directory: firmware
+      - name: Build scripts
+        run: python3 -m unittest discover -s firmware/scripts -v
+      - name: Simulator
+        run: python3 -m unittest discover -s tools -v
 
   format:
     name: Formatting
@@ -35,10 +43,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      # Other clang-format versions lay the code out differently.
       - run: pip install clang-format==22.1.5
-      - run: clang-format --dry-run -Werror src/*.[ch] lib/*/*/*.[ch] test/*/*.c fuzz/*.c
-        working-directory: firmware
+      - run: firmware/scripts/format.sh --check
 
   firmware:
     name: Firmware build
@@ -60,30 +66,52 @@ jobs:
       - run: printf '[secrets]\nsetup_pass = piepr1234\n' > firmware/secrets.ini
       - run: pio run
         working-directory: firmware
+      # Keep the toolchain in the cache, not the downloads it was unpacked from.
+      - run: rm -rf ~/.platformio/.cache
       - uses: actions/upload-artifact@v7
         with:
           name: firmware
           path: firmware/.pio/build/supermini/firmware.bin
+          retention-days: 7
 
-  tools:
-    name: Simulator tests
+  fuzz-targets:
+    name: Fuzz targets
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 5
+    outputs:
+      list: ${{ steps.list.outputs.list }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
-      - run: python3 -m unittest discover -s tools -v
+      # Every firmware/fuzz/fuzz_<target>.c is a target.
+      - id: list
+        run: |
+          list="$(ls firmware/fuzz/fuzz_*.c | sed -e 's|.*/fuzz_||' -e 's|\.c$||' | jq -R . | jq -sc .)"
+          echo "list=$list" >> "$GITHUB_OUTPUT"
 
   fuzz:
     name: Fuzz (${{ matrix.target }})
+    needs: fuzz-targets
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        target: [p1_framer, wifi_form, captive_dns, json_escape, lang_pick]
+        target: ${{ fromJSON(needs.fuzz-targets.outputs.list) }}
     steps:
       - uses: actions/checkout@v7
+      # Each run starts from what earlier runs found, and adds to it.
+      - uses: actions/cache@v6
+        with:
+          path: firmware/fuzz/build/corpus/${{ matrix.target }}
+          key: fuzz-${{ matrix.target }}-${{ github.run_id }}
+          restore-keys: fuzz-${{ matrix.target }}-
       - run: firmware/fuzz/run.sh ${{ matrix.target }} 60
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-${{ matrix.target }}-findings
+          path: |
+            firmware/fuzz/build/crash-*
+            firmware/fuzz/build/leak-*
+            firmware/fuzz/build/timeout-*
+            firmware/fuzz/build/oom-*

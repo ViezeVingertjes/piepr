@@ -34,14 +34,19 @@ def crc16_arc(data: bytes) -> int:
     return crc
 
 
+# A household that is never quite idle: a base load plus two slow waves, each
+# (kW, seconds). Between 0.03 and 0.87 kW.
+BASE_KW = 0.45
+WAVES = ((0.30, 700), (0.12, 53))
+
+
 def _power_kw(t: float) -> float:
-    """A household that is never quite idle: between 0.03 and 0.87 kW."""
-    return 0.45 + 0.30 * math.sin(t / 700) + 0.12 * math.sin(t / 53)
+    return BASE_KW + sum(kw * math.sin(t / period) for kw, period in WAVES)
 
 
 def _energy_kwh(t: float) -> float:
     """The power above, added up from 0 to t seconds (so the counters match it)."""
-    kw_seconds = 0.45 * t + 0.30 * 700 * (1 - math.cos(t / 700)) + 0.12 * 53 * (1 - math.cos(t / 53))
+    kw_seconds = BASE_KW * t + sum(kw * period * (1 - math.cos(t / period)) for kw, period in WAVES)
     return kw_seconds / 3600
 
 

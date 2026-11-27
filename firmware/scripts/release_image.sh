@@ -15,7 +15,9 @@ out="$outdir/$name"
 
 BOOTLOADER_AT=0x0
 PARTITIONS_AT=0x8000
-FIRMWARE_AT=0x20000
+# The firmware goes where partitions.csv puts the first firmware slot.
+FIRMWARE_AT="$(awk -F, '$1 ~ /^ *ota_0 *$/ { gsub(/ /, "", $4); print $4 }' "$(dirname "$here")/partitions.csv")"
+[ -n "$FIRMWARE_AT" ] || { echo "no ota_0 in partitions.csv" >&2; exit 1; }
 
 for part in bootloader partitions firmware; do
     [ -f "$build/$part.bin" ] || { echo "missing $build/$part.bin: run 'pio run' first" >&2; exit 1; }
@@ -23,13 +25,11 @@ done
 mkdir -p "$outdir"
 
 "${ESPTOOL:-esptool}" --chip esp32c3 merge-bin -o "$out" \
-    --flash-mode dio --flash-freq 80m --flash-size 4MB \
     "$BOOTLOADER_AT" "$build/bootloader.bin" \
     "$PARTITIONS_AT" "$build/partitions.bin" \
     "$FIRMWARE_AT" "$build/firmware.bin"
 
-# Each part must sit unchanged at its address. That includes the bootloader's
-# header: the flash settings above have to be the ones the build used.
+# Each part must sit unchanged at its address.
 cmp -n "$(stat -c%s "$build/bootloader.bin")" "$build/bootloader.bin" "$out" 0 "$((BOOTLOADER_AT))"
 cmp -n "$(stat -c%s "$build/partitions.bin")" "$build/partitions.bin" "$out" 0 "$((PARTITIONS_AT))"
 cmp "$build/firmware.bin" "$out" 0 "$((FIRMWARE_AT))"

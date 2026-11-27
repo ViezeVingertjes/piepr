@@ -27,5 +27,5 @@ body:
     id: log
     attributes:
       label: Log
-      description: If you can, a minute of log from "pio device monitor" or the console of the web flasher.
+      description: If you can, the log from start-up onwards and a few minutes after it, from "Show the log" on the install page (piepr.nl/en/install) or from "pio device monitor".
       render: text
