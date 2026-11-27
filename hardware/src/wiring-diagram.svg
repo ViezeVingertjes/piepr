@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 820" width="1180" height="820" font-family="Ubuntu, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-label="Wiring: P1 cable to ESP32-C3 SuperMini"><title>Wiring: P1 cable to ESP32-C3 SuperMini</title>
+<style>
+.h1{font-size:26px;font-weight:700;fill:#0e2236}
+.sub{font-size:15px;fill:#3d4f63}
+.t{font-size:15px;fill:#0e2236}
+.s{font-size:13px;fill:#55657a}
+.b{font-weight:700}
+.silk{font-size:11px;fill:#fff;font-weight:700}
+.num{font-size:15px;font-weight:700;fill:#fff}
+</style>
+<rect width="1180" height="820" fill="#fff"/>
+<rect width="1180" height="6" fill="#ffc21a"/>
+<g transform="translate(1068 24) scale(0.34)"><path fill="none" stroke="#0e2236" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" d="M5.5 82V40M45.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M63 26V60M78 40H118A20 20 0 1 0 112.1 54.1M133.5 82V40M173.5 40a20 20 0 1 1-40 0a20 20 0 1 1 40 0M188.5 60V40A20 20 0 0 1 208.5 20"/><circle cx="63" cy="6" r="7" fill="#ff4b3e"/></g>
+<rect x="150" y="170" width="360.0" height="450.0" rx="16.0" fill="#1f2125"/>
+<rect x="241.0" y="150.0" width="178.0" height="144.0" rx="24.0" fill="#c7cbd1" stroke="#8d939b"/>
+<text x="330.0" y="234.0" class="s b" text-anchor="middle" >USB-C</text>
+
+<rect x="236.0" y="336.0" width="60" height="60" rx="6.0" fill="#d8d8d8"/>
+<circle cx="266.0" cy="366.0" r="18.0" fill="#555"/>
+<text x="266.0" y="420.0" class="silk" text-anchor="middle" >BOOT</text>
+
+<rect x="364.0" y="336.0" width="60" height="60" rx="6.0" fill="#d8d8d8"/>
+<circle cx="394.0" cy="366.0" r="18.0" fill="#555"/>
+<text x="394.0" y="420.0" class="silk" text-anchor="middle" >RST</text>
+
+<polygon points="330,442.0 382.0,494.0 330,546.0 278.0,494.0" fill="#2f3237" stroke="#4a4e55"/>
+<rect x="274.0" y="584.0" width="112.0" height="30.0" rx="4.0" fill="#e6d3c7"/>
+<circle cx="175.4" cy="228.0" r="17.0" fill="#d9b45a"/><circle cx="175.4" cy="228.0" r="8.4" fill="#3a3a3a"/>
+<circle cx="175.4" cy="278.79999999999995" r="17.0" fill="#d9b45a"/><circle cx="175.4" cy="278.79999999999995" r="8.4" fill="#3a3a3a"/>
+<circle cx="175.4" cy="329.6" r="17.0" fill="#d9b45a"/><circle cx="175.4" cy="329.6" r="8.4" fill="#3a3a3a"/>
+<circle cx="175.4" cy="380.4" r="17.0" fill="#d9b45a"/><circle cx="175.4" cy="380.4" r="8.4" fill="#3a3a3a"/>
+<circle cx="175.4" cy="431.2" r="17.0" fill="#d9b45a"/><circle cx="175.4" cy="431.2" r="8.4" fill="#3a3a3a"/>
+<circle cx="175.4" cy="482.0" r="17.0" fill="#d9b45a"/><circle cx="175.4" cy="482.0" r="8.4" fill="#3a3a3a"/>
+<circle cx="175.4" cy="532.8" r="17.0" fill="#d9b45a"/><circle cx="175.4" cy="532.8" r="8.4" fill="#3a3a3a"/>
+<circle cx="175.4" cy="583.6" r="17.0" fill="#d9b45a"/><circle cx="175.4" cy="583.6" r="8.4" fill="#3a3a3a"/>
+<circle cx="484.6" cy="228.0" r="17.0" fill="#d9b45a"/><circle cx="484.6" cy="228.0" r="8.4" fill="#3a3a3a"/>
+<circle cx="484.6" cy="278.79999999999995" r="17.0" fill="#d9b45a"/><circle cx="484.6" cy="278.79999999999995" r="8.4" fill="#3a3a3a"/>
+<circle cx="484.6" cy="329.6" r="17.0" fill="#d9b45a"/><circle cx="484.6" cy="329.6" r="8.4" fill="#3a3a3a"/>
+<circle cx="484.6" cy="380.4" r="17.0" fill="#d9b45a"/><circle cx="484.6" cy="380.4" r="8.4" fill="#3a3a3a"/>
+<circle cx="484.6" cy="431.2" r="17.0" fill="#d9b45a"/><circle cx="484.6" cy="431.2" r="8.4" fill="#3a3a3a"/>
+<circle cx="484.6" cy="482.0" r="17.0" fill="#d9b45a"/><circle cx="484.6" cy="482.0" r="8.4" fill="#3a3a3a"/>
+<circle cx="484.6" cy="532.8" r="17.0" fill="#d9b45a"/><circle cx="484.6" cy="532.8" r="8.4" fill="#3a3a3a"/>
+<circle cx="484.6" cy="583.6" r="17.0" fill="#d9b45a"/><circle cx="484.6" cy="583.6" r="8.4" fill="#3a3a3a"/>
+<text x="456.6" y="232.0" class="silk" text-anchor="end" >5V</text>
+
+<text x="456.6" y="282.8" class="silk" text-anchor="end" >G</text>
+
+<text x="456.6" y="333.6" class="silk" text-anchor="end" >3.3</text>
+
+<text x="456.6" y="384.4" class="silk" text-anchor="end" >4</text>
+
+<text x="456.6" y="435.2" class="silk" text-anchor="end" >3</text>
+
+<text x="456.6" y="486.0" class="silk" text-anchor="end" >2</text>
+
+<text x="456.6" y="536.8" class="silk" text-anchor="end" >1</text>
+
+<text x="456.6" y="587.6" class="silk" text-anchor="end" >0</text>
+
+<text x="143.4" y="233.0" class="s" text-anchor="end" >GPIO5</text>
+
+<text x="143.4" y="283.8" class="s" text-anchor="end" >GPIO6</text>
+
+<text x="143.4" y="334.6" class="s" text-anchor="end" >GPIO7</text>
+
+<text x="143.4" y="385.4" class="s" text-anchor="end" >GPIO8</text>
+
+<text x="143.4" y="436.2" class="s" text-anchor="end" >GPIO9</text>
+
+<text x="143.4" y="487.0" class="s" text-anchor="end" >GPIO10</text>
+
+<text x="143.4" y="537.8" class="s" text-anchor="end" >GPIO20</text>
+
+<text x="143.4" y="588.6" class="s" text-anchor="end" >GPIO21</text>
+
+<polyline points="484.6,228.0 564.6,180 730,180" fill="none" stroke="#d32f2f" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="484.6,228.0 564.6,238 730,238" fill="none" stroke="#ef6c00" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="484.6,278.79999999999995 564.6,288 730,288" fill="none" stroke="#222" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="484.6,278.79999999999995 564.6,330 730,330" fill="none" stroke="#222" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="484.6,380.4 564.6,440 730,440" fill="none" stroke="#2e7d32" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="620" y="171.0" width="56" height="18" rx="3" fill="#1b1b1b"/><rect x="625" y="171.0" width="7.840000000000001" height="18" fill="#c0c0c0"/>
+
+<line x1="670" y1="505" x2="730" y2="505" stroke="#9e9e9e" stroke-width="5" stroke-linecap="round"/><rect x="646" y="495" width="16" height="20" rx="3" fill="#bdbdbd"/>
+<polyline points="484.6,329.6 512.6,329.6 512.6,380.4 484.6,380.4" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round"/>
+<rect x="504.6" y="336.0" width="16" height="38" rx="5" fill="#e8d3a6" stroke="#9c8250"/>
+<rect x="504.6" y="341.0" width="16" height="3.5" fill="#c62828"/>
+<rect x="504.6" y="347.5" width="16" height="3.5" fill="#c62828"/>
+<rect x="504.6" y="354.0" width="16" height="3.5" fill="#c62828"/>
+<rect x="504.6" y="360.5" width="16" height="3.5" fill="#c9a227"/>
+
+<text x="40.0" y="48.0" class="h1" text-anchor="start" >Wiring: P1 cable to ESP32-C3 SuperMini</text>
+<text x="40.0" y="76.0" class="sub" text-anchor="start" >Board seen from the top: USB-C at the top, the BOOT and RST buttons facing you.</text>
+<text x="40.0" y="98.0" class="sub" text-anchor="start" >Wire colours here show the function; your cable's colours differ (see step 1).</text>
+<circle cx="760" cy="180" r="13" fill="#d32f2f"/>
+<text x="760" y="185" class="num" text-anchor="middle">1</text>
+<text x="782.0" y="178.0" class="t b" text-anchor="start" >P1 pin 1</text>
+<text x="782.0" y="196.0" class="s" text-anchor="start" >+5 V (DSMR 5 only), through the diode</text>
+<circle cx="760" cy="238" r="13" fill="#ef6c00"/>
+<text x="760" y="243" class="num" text-anchor="middle">2</text>
+<text x="782.0" y="236.0" class="t b" text-anchor="start" >P1 pin 2</text>
+<text x="782.0" y="254.0" class="s" text-anchor="start" >Data request</text>
+<circle cx="760" cy="288" r="13" fill="#222"/>
+<text x="760" y="293" class="num" text-anchor="middle">3</text>
+<text x="782.0" y="286.0" class="t b" text-anchor="start" >P1 pin 3</text>
+<text x="782.0" y="304.0" class="s" text-anchor="start" >Data ground</text>
+<circle cx="760" cy="330" r="13" fill="#222"/>
+<text x="760" y="335" class="num" text-anchor="middle">6</text>
+<text x="782.0" y="328.0" class="t b" text-anchor="start" >P1 pin 6</text>
+<text x="782.0" y="346.0" class="s" text-anchor="start" >Power ground</text>
+<circle cx="760" cy="440" r="13" fill="#2e7d32"/>
+<text x="760" y="445" class="num" text-anchor="middle">5</text>
+<text x="782.0" y="438.0" class="t b" text-anchor="start" >P1 pin 5</text>
+<text x="782.0" y="456.0" class="s" text-anchor="start" >Data</text>
+<text x="648.0" y="158.0" class="s b" text-anchor="middle" >1N5819 diode, stripe towards the board</text>
+<circle cx="760" cy="505" r="13" fill="#9e9e9e"/>
+<text x="760" y="510" class="num" text-anchor="middle">4</text>
+<text x="782.0" y="503.0" class="t b" text-anchor="start" >P1 pin 4</text>
+<text x="782.0" y="521.0" class="s" text-anchor="start" >Not used: cut short, cover with heat shrink</text>
+<line x1="522.6" y1="355.0" x2="624.6" y2="375.0" stroke="#777" stroke-dasharray="4 3"/><text x="630.6" y="371.0" class="t b" text-anchor="start" >2.2 kΩ resistor across the 3.3 and 4 pads</text>
+<text x="630.6" y="389.0" class="s" text-anchor="start" >either way round; never a plain wire here</text>
+<text x="330.0" y="136.0" class="t b" text-anchor="middle" >Power: USB-C charger (5 V)</text>
+<line x1="40" y1="670" x2="1140" y2="670" stroke="#d3dbe3"/><text x="40.0" y="700.0" class="t b" text-anchor="start" >Before you start</text>
+<text x="40.0" y="724.0" class="s b" text-anchor="start" >1.</text>
+<text x="62.0" y="724.0" class="s" text-anchor="start" >Check the colour table from step 1 before soldering anything.</text>
+<text x="40.0" y="744.0" class="s b" text-anchor="start" >2.</text>
+<text x="62.0" y="744.0" class="s" text-anchor="start" >Slide heat shrink onto the wires before you solder them.</text>
+<text x="40.0" y="764.0" class="s b" text-anchor="start" >3.</text>
+<text x="62.0" y="764.0" class="s" text-anchor="start" >The board's pins are 3.3 V only: the data wire (pin 5) never goes to 5V.</text>
+<text x="40.0" y="784.0" class="s b" text-anchor="start" >4.</text>
+<text x="62.0" y="784.0" class="s" text-anchor="start" >Measure with the multimeter (step 6) before you plug into the meter.</text>
+</svg>
