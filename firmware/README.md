@@ -19,6 +19,7 @@ telegrams raw on **TCP port 8088** (up to **5 readers**; a 6th replaces the one 
 
 Or from a terminal: `esptool.py --chip esp32c3 write_flash 0x0 piepr-<version>.bin`.
 The release uses setup password **piepr1234**; for your own, build it yourself.
+Flashing a release also clears the saved WiFi network: set it up again from your phone.
 
 ## Build it yourself
 Needs [PlatformIO](https://platformio.org/install) (CLI or VS Code). The first build
@@ -89,7 +90,7 @@ device retries the saved network. A temporary outage needs no action.
 | `lib/portalcore/` | **Pure C:** `wifi_form`, `captive_dns`, `channel_pick`, `json_escape`, `setup_state` (network list, page JSON), `recovery` |
 | `test/` | Unity tests, one folder per module (`pio test -e native`) |
 | `fuzz/` | libFuzzer harnesses: `fuzz/run.sh <target> [seconds]` |
-| `scripts/` | Build steps: `gen_secrets.py`, `gen_version.py`, `gen_web.py`, `gen_common.py`, `native_sanitizers.py` |
+| `scripts/` | Build steps: `gen_secrets.py`, `gen_version.py`, `gen_web.py`, `gen_common.py`, `native_sanitizers.py`; `release_image.sh` makes the release file |
 | `sdkconfig.defaults` | ESP-IDF options (explained in the file) |
 
 Conventions: module name as function prefix (`tcp_server_*`), file-static state `s_`,

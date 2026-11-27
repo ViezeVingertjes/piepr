@@ -1,0 +1,57 @@
+name: Release
+
+# A pushed tag (v1.2.3) builds the image and opens a draft release with the
+# notes from CHANGELOG.md. A manual run only builds the image, as an artifact.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  image:
+    name: Release image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the version string comes from git describe
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install platformio==6.2.0 esptool==5.3.0
+      # The setup password of the release firmware; it is public.
+      - run: printf '[secrets]\nsetup_pass = piepr1234\n' > firmware/secrets.ini
+      - run: pio test -e native
+        working-directory: firmware
+      - run: pio run
+        working-directory: firmware
+      - name: Build the image
+        id: image
+        working-directory: firmware
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            version="$GITHUB_REF_NAME"
+          else
+            version="$(git describe --always --tags)"
+          fi
+          scripts/release_image.sh "$version" out
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: image
+          path: firmware/out/
+      - name: Draft the release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.image.outputs.version }}
+        run: |
+          awk -v v="${VERSION#v}" '$1 == "##" { p = ($2 "" == v ""); next } p' CHANGELOG.md > notes.md
+          grep -q '[^[:space:]]' notes.md || { echo "CHANGELOG.md has no section for ${VERSION#v}" >&2; exit 1; }
+          gh release create "$VERSION" --draft --verify-tag --title "Piepr ${VERSION#v}" \
+            --notes-file notes.md firmware/out/*
