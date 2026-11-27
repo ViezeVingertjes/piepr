@@ -43,9 +43,9 @@ typedef struct {
     const uint8_t *start;
     const uint8_t *end;
 } page_t;
-#define EMBEDDED_PAGE(name)                                                                    \
-    extern const uint8_t name##_start[] asm("_binary_" #name "_html_gz_start");                \
-    extern const uint8_t name##_end[] asm("_binary_" #name "_html_gz_end");                    \
+#define EMBEDDED_PAGE(name)                                                                        \
+    extern const uint8_t name##_start[] asm("_binary_" #name "_html_gz_start");                    \
+    extern const uint8_t name##_end[] asm("_binary_" #name "_html_gz_end");                        \
     static const page_t PAGE_##name = { name##_start, name##_end }
 EMBEDDED_PAGE(setup);
 EMBEDDED_PAGE(saved);
@@ -130,8 +130,8 @@ static esp_err_t handle_state(httpd_req_t *req)
     const portal_t *portal = req->user_ctx;
     bool scanning = atomic_load(&portal->scanning);
     size_t len = setup_state_json((setup_reason_t)s_request.reason, s_request.reason_ssid,
-                                  portal->networks, scanning ? 0 : portal->network_count,
-                                  scanning, json, SETUP_STATE_JSON_MAX);
+                                  portal->networks, scanning ? 0 : portal->network_count, scanning,
+                                  json, SETUP_STATE_JSON_MAX);
     esp_err_t err =
         len > 0 ? send_response(req, HTTPD_200, "application/json", json, len)
                 : httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "State too large");
@@ -295,10 +295,10 @@ void setup_portal_run(bool has_wifi)
 
     configure_dhcp(ap, &ip, portal);
     start_http_server(portal);
-    BaseType_t ok =
-        xTaskCreate(dns_task, "setup_dns", DNS_TASK_STACK, portal, DNS_TASK_PRIO, NULL);
+    BaseType_t ok = xTaskCreate(dns_task, "setup_dns", DNS_TASK_STACK, portal, DNS_TASK_PRIO, NULL);
     configASSERT(ok == pdPASS);
-    ESP_LOGI(TAG, "access point \"%s\" on channel %u, open %s", SETUP_AP_SSID, channel, portal->url);
+    ESP_LOGI(TAG, "access point \"%s\" on channel %u, open %s", SETUP_AP_SSID, channel,
+             portal->url);
 
     /* Without a known network there is nothing to return to: wait for a save.
      * Otherwise return to normal mode after the window, counted from the last

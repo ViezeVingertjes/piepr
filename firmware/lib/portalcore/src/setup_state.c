@@ -102,8 +102,8 @@ void setup_survey_result(const setup_survey_entry_t *survey, size_t count, setup
 {
     for (size_t i = 0; i < count; i++) {
         const setup_survey_entry_t *e = &survey[i];
-        setup_networks_add(list, list_count, e->ssid, strlen(e->ssid),
-                           survey_average(e), e->secure);
+        setup_networks_add(list, list_count, e->ssid, strlen(e->ssid), survey_average(e),
+                           e->secure);
     }
 }
 

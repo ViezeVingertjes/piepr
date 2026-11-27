@@ -263,7 +263,8 @@ void test_survey_min_rssi_applies_to_average(void)
 void test_json_empty(void)
 {
     size_t n = setup_state_json(SETUP_REASON_NONE, NULL, NULL, 0, false, json, sizeof(json));
-    TEST_ASSERT_EQUAL_STRING("{\"reason\":\"none\",\"reason_ssid\":\"\",\"scanning\":false,\"networks\":[]}", json);
+    TEST_ASSERT_EQUAL_STRING(
+        "{\"reason\":\"none\",\"reason_ssid\":\"\",\"scanning\":false,\"networks\":[]}", json);
     TEST_ASSERT_EQUAL_size_t(strlen(json), n);
 }
 
@@ -273,17 +274,19 @@ void test_json_reason_and_nets(void)
     add("Home", -60, true);
     add("Cafe", -80, false);
     setup_state_json(SETUP_REASON_AUTH, "Home", list, count, false, json, sizeof(json));
-    TEST_ASSERT_EQUAL_STRING("{\"reason\":\"auth\",\"reason_ssid\":\"Home\",\"scanning\":false,\"networks\":["
-                             "{\"ssid\":\"Home\",\"rssi\":-60,\"secure\":true},"
-                             "{\"ssid\":\"Cafe\",\"rssi\":-80,\"secure\":false}]}",
-                             json);
+    TEST_ASSERT_EQUAL_STRING(
+        "{\"reason\":\"auth\",\"reason_ssid\":\"Home\",\"scanning\":false,\"networks\":["
+        "{\"ssid\":\"Home\",\"rssi\":-60,\"secure\":true},"
+        "{\"ssid\":\"Cafe\",\"rssi\":-80,\"secure\":false}]}",
+        json);
 }
 
 void test_json_no_connect_reason(void)
 {
     setup_state_json(SETUP_REASON_NO_CONNECT, "Gone", NULL, 0, false, json, sizeof(json));
-    TEST_ASSERT_EQUAL_STRING("{\"reason\":\"no_connect\",\"reason_ssid\":\"Gone\",\"scanning\":false,\"networks\":[]}",
-                             json);
+    TEST_ASSERT_EQUAL_STRING(
+        "{\"reason\":\"no_connect\",\"reason_ssid\":\"Gone\",\"scanning\":false,\"networks\":[]}",
+        json);
 }
 
 void test_json_scanning(void)
@@ -311,8 +314,8 @@ void test_json_worst_case_fits(void)
         worst[i].rssi = -128;
         worst[i].secure = false;
     }
-    size_t n = setup_state_json(SETUP_REASON_NO_CONNECT, ssid, worst, SETUP_SCAN_LIST_MAX, false, json,
-                                sizeof(json));
+    size_t n = setup_state_json(SETUP_REASON_NO_CONNECT, ssid, worst, SETUP_SCAN_LIST_MAX, false,
+                                json, sizeof(json));
     TEST_ASSERT_TRUE(n > 0 && n < SETUP_STATE_JSON_MAX);
 }
 

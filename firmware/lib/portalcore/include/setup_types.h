@@ -9,8 +9,8 @@
 
 /* Networks offered on the setup page: the strongest few that are usable. A
  * weaker or hidden network can still be typed in by name. */
-#define SETUP_SCAN_LIST_MAX  10
-#define SETUP_SCAN_MIN_RSSI  (-80) /* dBm; weaker links don't stay connected reliably */
+#define SETUP_SCAN_LIST_MAX 10
+#define SETUP_SCAN_MIN_RSSI (-80) /* dBm; weaker links don't stay connected reliably */
 
 typedef enum {
     SETUP_REASON_NONE,       /* entered by the user (or nothing configured) */

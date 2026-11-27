@@ -146,7 +146,7 @@ void p1_reader_start(void)
         .source_clk = UART_SCLK_DEFAULT,
     };
     ESP_ERROR_CHECK(uart_driver_install(P1_UART_NUM, UART_RX_BUF_SIZE, 0, UART_EVENT_QUEUE_LEN,
-                                        &s_uart_queue, 0));
+                                        &s_uart_queue, ESP_INTR_FLAG_IRAM));
     ESP_ERROR_CHECK(uart_param_config(P1_UART_NUM, &cfg));
     ESP_ERROR_CHECK(uart_set_pin(P1_UART_NUM, UART_PIN_NO_CHANGE, P1_RX_GPIO, UART_PIN_NO_CHANGE,
                                  UART_PIN_NO_CHANGE));

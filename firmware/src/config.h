@@ -24,10 +24,10 @@
 #define TCP_SERVER_TASK_PRIO  5
 
 /* Supervisor (normal mode) */
-#define HEARTBEAT_PERIOD_S      60
-#define OFFLINE_RESTART_S       (15 * 60)
-#define NO_CLIENT_RESTART_S     (30 * 60)   /* online, readers seen since boot, but none now */
-#define MIN_HEAP_BLOCK          (16 * 1024) /* largest free block below this: restart */
+#define HEARTBEAT_PERIOD_S  60
+#define OFFLINE_RESTART_S   (15 * 60)
+#define NO_CLIENT_RESTART_S (30 * 60)   /* online, readers seen since boot, but none now */
+#define MIN_HEAP_BLOCK      (16 * 1024) /* largest free block below this: restart */
 
 /* WiFi setup portal */
 #define SETUP_BUTTON_GPIO       9 /* BOOT, active low */

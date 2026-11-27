@@ -35,7 +35,8 @@ _Static_assert(SELECT_TIMEOUT_MS < CONFIG_ESP_TASK_WDT_TIMEOUT_S * 1000, "must f
 #define KEEPALIVE_INTERVAL_S 10
 #define KEEPALIVE_PROBES     3 /* dead client detected after ~60 s */
 
-_Static_assert(TCP_MAX_CLIENTS + 1 <= CONFIG_LWIP_MAX_SOCKETS, "clients + listener must fit lwIP's sockets");
+_Static_assert(TCP_MAX_CLIENTS + 1 <= CONFIG_LWIP_MAX_SOCKETS,
+               "clients + listener must fit lwIP's sockets");
 
 static const char *TAG = "tcp";
 
@@ -74,6 +75,17 @@ static void close_client(int i, const char *why)
 
     close(fd); /* SO_LINGER {1,0}: aborts immediately */
     ESP_LOGI(TAG, "client %s (%d/%d)", why, n, TCP_MAX_CLIENTS);
+}
+
+/* Server task only. True when slot `i` has a broadcast that failed; `*result`
+ * is then the bytes sent, or -errno. */
+static bool send_failure(int i, int *result)
+{
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    bool failed = s_clients[i].fd >= 0 && s_clients[i].send_failed;
+    *result = s_clients[i].send_result;
+    xSemaphoreGive(s_lock);
+    return failed;
 }
 
 static void close_all_clients(const char *why)
@@ -214,9 +226,9 @@ static void server_task(void *arg)
         esp_task_wdt_reset();
 
         for (int i = 0; i < TCP_MAX_CLIENTS; i++) {
-            if (s_clients[i].fd >= 0 && s_clients[i].send_failed) {
+            int result;
+            if (send_failure(i, &result)) {
                 char why[48];
-                int result = s_clients[i].send_result;
                 snprintf(why, sizeof(why),
                          result < 0 ? "dropped (send error %d)" : "dropped (too slow, sent %d)",
                          result < 0 ? -result : result);
