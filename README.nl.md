@@ -64,8 +64,6 @@ dubbel knippert (ongeveer 5 seconden).
 |---|---|---|
 | Nederlandse slimme meters | DSMR 4.x, 5.x | ondersteund |
 | Belgische digitale meters (Fluvius) | e-MUCS P1 | ondersteund; zet eerst de gebruikerspoorten aan op [mijn.fluvius.be/poortbeheer](https://mijn.fluvius.be/poortbeheer) |
-| Oudere Nederlandse meters | DSMR 2.2, 3 | niet ondersteund (9600 baud, geen controlesom) |
-| Luxemburg (Smarty) | | niet ondersteund (versleuteld) |
 
 Piepr wordt ontwikkeld op een Landis+Gyr E350 (DSMR 4.0). Werkt er iets niet op jouw
 meter? Maak een [metermelding](https://github.com/ViezeVingertjes/piepr/issues/new?template=meter-report.yml).

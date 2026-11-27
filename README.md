@@ -62,8 +62,6 @@ To change the WiFi later, hold the **BOOT** button until the light double-blinks
 |---|---|---|
 | Dutch smart meters | DSMR 4.x, 5.x | supported |
 | Belgian digital meters (Fluvius) | e-MUCS P1 | supported; switch the user ports on first at [mijn.fluvius.be/poortbeheer](https://mijn.fluvius.be/poortbeheer) |
-| Older Dutch meters | DSMR 2.2, 3 | not supported (9600 baud, no checksum) |
-| Luxembourg (Smarty) | | not supported (encrypted) |
 
 Piepr is developed on a Landis+Gyr E350 (DSMR 4.0). Something not working on your
 meter? Open a [meter report](https://github.com/ViezeVingertjes/piepr/issues/new?template=meter-report.yml).
