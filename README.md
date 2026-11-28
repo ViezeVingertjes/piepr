@@ -18,6 +18,8 @@ available on your own network. No app, no account, no cloud.
 - Serves the raw telegrams at `piepr.local`, port `8088`, for any software that
   reads P1 data: Home Assistant (DSMR Smart Meter), Domoticz (P1 Smart Meter with LAN
   interface), DSMR-reader, or your own script; up to 5 at the same time
+- A status page at `http://piepr.local`: is it reading the meter, the power right
+  now, the meter readings
 - WiFi setup from your phone, with a list of nearby networks
 - Recovers by itself: when it can't join your WiFi, the setup hotspot comes back and
   says why
@@ -38,13 +40,18 @@ available on your own network. No app, no account, no cloud.
    `http://192.168.4.1` while your phone is on Piepr-Setup).
 3. Pick your home network, enter its password and save. Piepr works with
    **2.4 GHz** WiFi only.
-4. When the light **stays on**, Piepr is connected.
+4. When the light **stays on**, Piepr is connected. Open `http://piepr.local` in a
+   browser to see what your meter says.
 5. Point your software at `piepr.local`, port `8088`. In Home Assistant: Settings →
    Devices & services → Add integration → DSMR Smart Meter → Network. DSMR version:
    4 or 5, usually printed on the front of the meter; 5B in Belgium.
 
 To change the WiFi later, hold the **BOOT** button until the light double-blinks
 (about 5 seconds).
+
+<p align="center">
+  <img src="assets/status-page.png" alt="Piepr's status page on a computer and on a phone: 412 W in use right now, the meter readings and how many telegrams arrived" width="820">
+</p>
 
 | Light | Meaning |
 |---|---|

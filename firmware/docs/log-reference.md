@@ -34,6 +34,9 @@ chip itself.
 | `button: hold BOOT for 5 s to start WiFi setup` | button armed |
 | `button: no setup button on this board` | WiFi setup only comes back through recovery (or a reflash) |
 | `mdns: announcing piepr.local, _dsmr._tcp port 8088` | mDNS up |
+| `web: status page at http://piepr.local (port 80)` | the status page can be opened |
+| `web: status page not started: …` | the web server could not start; everything else works |
+| `mdns: web page not announced: …` | the status page works, but programs that look for web pages on the network won't list it |
 | `tcp: listening on port 8088 (max 5 clients)` | server up |
 | `tcp: client … connected (n/5)` / `disconnected (n/5)` | reader joined/left |
 | `tcp: client evicted (oldest) (n/5)` | 6th reader; the one connected longest is closed |

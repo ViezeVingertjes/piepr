@@ -10,9 +10,13 @@
 #define P1_BAUD 115200
 
 /* Network */
-#define HOSTNAME        "piepr"
-#define TCP_PORT        8088
-#define TCP_MAX_CLIENTS 5 /* a 6th replaces the longest-connected (see tcp_server.c) */
+#define HOSTNAME          "piepr"
+#define TCP_PORT          8088
+#define TCP_MAX_CLIENTS   5  /* a 6th replaces the longest-connected (see tcp_server.c) */
+#define HTTP_PORT         80 /* the status page; in setup mode the setup page */
+#define HTTP_MAX_CLIENTS  3  /* browsers at once on the status page */
+#define HTTPD_OWN_SOCKETS 3  /* a web server's own: listener, control socket, one spare */
+#define HTTP_WAIT_S       3  /* for a browser that stalls, before it is dropped */
 
 /* The tick that drives the status LED and polls the setup button */
 #define UI_TICK_MS 125
@@ -22,6 +26,7 @@
 #define P1_READER_TASK_PRIO   6
 #define TCP_SERVER_TASK_STACK 4096
 #define TCP_SERVER_TASK_PRIO  5
+#define HTTP_TASK_PRIO        3 /* the status page waits for both */
 
 /* Supervisor (normal mode) */
 #define HEARTBEAT_PERIOD_S  (5 * 60)
@@ -48,6 +53,7 @@
 #define LOG_TAG_MDNS   "mdns"
 #define LOG_TAG_TCP    "tcp"
 #define LOG_TAG_P1     "p1"
+#define LOG_TAG_WEB    "web"
 #define LOG_TAGS                                                                                   \
-    { LOG_TAG_MAIN,   LOG_TAG_CREDS, LOG_TAG_NET, LOG_TAG_SETUP,                                   \
-      LOG_TAG_BUTTON, LOG_TAG_MDNS,  LOG_TAG_TCP, LOG_TAG_P1 }
+    { LOG_TAG_MAIN, LOG_TAG_CREDS, LOG_TAG_NET, LOG_TAG_SETUP, LOG_TAG_BUTTON,                     \
+      LOG_TAG_MDNS, LOG_TAG_TCP,   LOG_TAG_P1,  LOG_TAG_WEB }

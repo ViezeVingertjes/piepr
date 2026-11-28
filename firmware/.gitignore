@@ -6,4 +6,5 @@ managed_components/
 src/secrets_gen.h
 src/version_gen.h
 src/web_pages_gen.inc
+src/web_pages_gen.h
 .vscode/

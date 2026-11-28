@@ -2,6 +2,9 @@
 import gzip
 import json
 import pathlib
+import re
+import shutil
+import subprocess
 import tempfile
 import unittest
 
@@ -20,7 +23,7 @@ def site(pages, dutch, parts=None):
     if parts:
         (root / "parts").mkdir()
         for name, text in parts.items():
-            (root / "parts" / (name + ".html")).write_text(text, encoding="utf-8")
+            (root / "parts" / (name if "." in name else name + ".html")).write_text(text, encoding="utf-8")
     return folder
 
 
@@ -43,15 +46,50 @@ class WebPages(unittest.TestCase):
         self.assertEqual(html(pages, "a", "en"), "<main>\n<p>x</p>\n</main>")
 
     def test_each_page_knows_its_own_and_the_other_language(self):
-        pages = self.build({"a": '<html lang="[[@lang]]"><a href="/?lang=[[@other]]">[[@other-name]]</a>'}, {})
-        self.assertEqual(html(pages, "a", "en"), '<html lang="en"><a href="/?lang=nl">Nederlands</a>')
-        self.assertEqual(html(pages, "a", "nl"), '<html lang="nl"><a href="/?lang=en">English</a>')
+        pages = self.build({"a": '<html lang="[[@lang]]"><b>[[@lang-name]]</b><a href="/?lang=[[@other]]">[[@other-name]]</a>'}, {})
+        self.assertEqual(html(pages, "a", "en"), '<html lang="en"><b>English</b><a href="/?lang=nl">Nederlands</a>')
+        self.assertEqual(html(pages, "a", "nl"), '<html lang="nl"><b>Nederlands</b><a href="/?lang=en">English</a>')
 
     def test_shared_parts_are_put_in_and_translated(self):
         pages = self.build({"a": "<main>\n  [[>foot]]\n</main>", "b": "<i>[[>foot]]</i>"},
                            {"Bye": "Dag"}, parts={"foot": "<p>[[Bye]]</p>\n<p>x</p>\n"})
         self.assertEqual(html(pages, "a", "nl"), "<main>\n<p>Dag</p>\n<p>x</p>\n</main>")
         self.assertEqual(html(pages, "b", "en"), "<i><p>Bye</p>\n<p>x</p></i>")
+
+    def test_a_part_can_be_a_stylesheet_or_a_script(self):
+        pages = self.build({"a": "<style>[[>base.css]]</style><script>[[>dom.js]]</script>"}, {},
+                           parts={"base.css": "a { color: red }\n", "dom.js": "var a = 1;\n"})
+        self.assertEqual(html(pages, "a", "en"), "<style>a{color:red}</style><script>var a=1;</script>")
+
+    def test_a_part_can_use_a_part(self):
+        pages = self.build({"a": "[[>head]]<p>x</p>"}, {"Hi": "Hoi"},
+                           parts={"head": "<style>[[>base.css]]</style>\n[[>title]]\n", "base.css": "a { b: c }",
+                                  "title": "<title>[[Hi]]</title>"})
+        self.assertEqual(html(pages, "a", "nl"), "<style>a{b:c}</style>\n<title>Hoi</title><p>x</p>")
+
+    def test_parts_may_go_as_deep_as_the_limit(self):
+        depth = web_pages.PART_DEPTH
+        parts = {"p%d" % n: "[[>p%d]]" % (n + 1) for n in range(1, depth)}
+        parts["p%d" % depth] = "<p>x</p>"
+        self.assertEqual(html(self.build({"a": "[[>p1]]"}, {}, parts=parts), "a", "en"), "<p>x</p>")
+
+    def test_a_part_that_uses_itself_stops_the_build(self):
+        with self.assertRaisesRegex(web_pages.PageError, "a.html.*parts within parts"):
+            self.build({"a": "[[>loop]]"}, {}, parts={"loop": "<p>[[>loop]]</p>"})
+
+    def test_comments_and_spare_whitespace_are_left_out(self):
+        pages = self.build({"a": "<!-- top -->\n<script>\n  /* why */\n  var a = \"[[Save]]\"; // b\n</script>"},
+                           {"Save": "Opslaan"})
+        self.assertEqual(html(pages, "a", "nl"), '<script>var a="Opslaan";</script>')
+
+    def test_a_script_that_cannot_be_read_stops_the_build(self):
+        with self.assertRaisesRegex(web_pages.PageError, "a.html.*never ends"):
+            self.build({"a": "<script>var a = \"x;\n</script>"}, {})
+
+    def test_english_text_that_could_break_the_page_stops_the_build(self):
+        for bad in ('say "hi"', "it's", "a<b", "a\\b"):
+            with self.assertRaisesRegex(web_pages.PageError, "a.html", msg=bad):
+                self.build({"a": "[[%s]]" % bad}, {bad: "x"})
 
     def test_a_missing_translation_stops_the_build(self):
         with self.assertRaisesRegex(web_pages.PageError, "no translation for 'Save'"):
@@ -76,11 +114,26 @@ class WebPages(unittest.TestCase):
 
     def test_the_real_pages_build_in_both_languages(self):
         pages = web_pages.build(WEB)
-        self.assertEqual(sorted(pages), ["invalid", "saved", "setup"])
+        self.assertEqual(sorted(pages), ["invalid", "saved", "setup", "status"])
         for name in pages:
             self.assertIn('<html lang="en">', html(pages, name, "en"))
             self.assertIn('<html lang="nl">', html(pages, name, "nl"))
-            self.assertNotIn("[[", html(pages, name, "en") + html(pages, name, "nl"))
+            for language in ("en", "nl"):
+                self.assertNotIn("[[", html(pages, name, language))
+                self.assertNotIn("<!--", html(pages, name, language))
+                self.assertNotIn("/*", html(pages, name, language))
+
+    @unittest.skipUnless(shutil.which("node"), "needs Node.js")
+    def test_the_scripts_in_the_real_pages_are_valid_javascript(self):
+        pages = web_pages.build(WEB)
+        with tempfile.TemporaryDirectory() as folder:
+            for name in pages:
+                for language in ("en", "nl"):
+                    for n, script in enumerate(re.findall(r"<script>(.*?)</script>", html(pages, name, language), re.S)):
+                        path = pathlib.Path(folder) / ("%s-%s-%d.js" % (name, language, n))
+                        path.write_text(script, encoding="utf-8")
+                        result = subprocess.run(["node", "--check", str(path)], capture_output=True, text=True)
+                        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 if __name__ == "__main__":

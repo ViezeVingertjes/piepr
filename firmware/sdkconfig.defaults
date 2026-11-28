@@ -20,6 +20,10 @@ CONFIG_LWIP_SO_LINGER=y
 # WiFi stalls on a weak link before a slow client is dropped.
 CONFIG_LWIP_TCP_SND_BUF_DEFAULT=16384
 
+# Sockets: 5 readers and their listener, 3 browsers on the status page and the
+# web server's own 3 (the default is 10). The sum is checked in src/status_page.c.
+CONFIG_LWIP_MAX_SOCKETS=12
+
 # UART interrupt handler in IRAM: keeps receiving P1 bytes while flash is busy.
 CONFIG_UART_ISR_IN_IRAM=y
 

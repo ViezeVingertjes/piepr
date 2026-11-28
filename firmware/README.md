@@ -2,7 +2,8 @@
 
 Reads the smart meter's P1 port, checks each telegram's CRC16 and serves valid
 telegrams raw on **TCP port 8088** (up to 5 readers; a 6th replaces the one connected longest). mDNS name:
-**`piepr.local`** (`_dsmr._tcp`). WiFi is set up from a phone (setup portal).
+**`piepr.local`** (`_dsmr._tcp`). A status page at `http://piepr.local` shows what it
+reads. WiFi is set up from a phone (setup portal).
 
 - Stack: ESP-IDF 6.1.1 via PlatformIO (`espressif32 @ 8.0.0`), C. Only extra
   dependency: Espressif's `mdns` component.
@@ -54,9 +55,9 @@ you save one. To change the network later: **hold BOOT until the LED double-blin
 3. Enter the password (shown while typing; skipped for open networks).
 4. Save. The device restarts and joins.
 
-The page is in Dutch on a phone set to Dutch and in English otherwise; a link at the
-top switches between the two. It works
-offline (gzipped in flash, about 5 KB per language). Name 1–32 bytes, password
+The page is in Dutch on a phone set to Dutch and in English otherwise; the links at the
+top switch between the two. It works
+offline (gzipped in flash, about 6 KB per language). Name 1–32 bytes, password
 empty or 8–63 bytes; checked on the page and again on the device. Without
 JavaScript, or on old browsers, it falls back to a plain form.
 
@@ -65,6 +66,43 @@ To leave without saving (only when a network was saved before): press RST, or wa
 
 Android: if the page doesn't open on a phone that joined the hotspot before,
 *forget* `Piepr-Setup` once and join again.
+
+## Status page
+`http://piepr.local` (port 80, normal mode only: during WiFi setup the setup page is
+there) shows the power right now, per phase where the meter sends it, the meter
+readings and gas, and how Piepr is doing: when the last telegram came, how many arrived
+and how many were rejected as damaged, readers, WiFi signal, uptime and firmware
+version. There is no headline that says whether things are fine: a last telegram longer
+than 30 seconds ago and a telegram rejected in the last 30 seconds turn red, and values
+that are old are dimmed. It follows the browser's language like the setup page, refreshes
+every 2 seconds and changes nothing on the device. It needs no sign-in: it shows what
+port 8088 already gives anyone on the network.
+
+The same facts as JSON, for a script or a dashboard:
+```bash
+curl http://piepr.local/api/status
+```
+```json
+{"firmware":"1.4.0","board":"ESP32-C3 SuperMini","uptime_s":86400,
+ "wifi":{"rssi":-61},
+ "readers":{"connected":2,"max":5},
+ "telegrams":{"ok":86000,"crc_errors":2,"overflows":0,"uart_errors":0,
+              "last_ok_ms":640,"last_rejected_ms":3600000},
+ "meter":{"name":"ISK5\\2M550T-1013","dsmr_version":50,"time":"2026-11-28T15:33:42+01:00",
+  "tariff":2,"delivered_t1_wh":4821377,"delivered_t2_wh":3907142,
+  "returned_t1_wh":0,"returned_t2_wh":0,"power_delivered_w":412,"power_returned_w":0,
+  "phases":[{"delivered_w":301,"returned_w":0,"voltage_dv":2314,"current_ma":1000},
+            {"delivered_w":68,"returned_w":0,"voltage_dv":2298,"current_ma":0},
+            {"delivered_w":43,"returned_w":0,"voltage_dv":2331,"current_ma":0}],
+  "gas_l":2218934,"gas_time":"2026-11-28T15:30:00+01:00"}}
+```
+Whole numbers in the smallest unit: Wh, W, tenths of a volt (`_dv`), mA, litres. The
+counts are since start-up; `last_ok_ms` is how long ago the last valid telegram
+arrived and `last_rejected_ms` how long ago one failed its checksum or was too long. A
+value that isn't known is left out: `rssi` without WiFi, `last_ok_ms` and everything in
+`meter` until a telegram arrived, `last_rejected_ms` while none was rejected, and
+whatever the meter doesn't send. The objects themselves, and three `phases`, are always
+there.
 
 ## Automatic recovery
 When the saved network can't be used, the setup hotspot comes back and the page says why:
@@ -84,20 +122,22 @@ device retries the saved network. A temporary outage needs no action.
 | `src/main.c` | Start-up (normal or setup boot); supervisor (heartbeat, restarts) |
 | `src/config.h` | Tunables: hostname, port, limits, timings (recovery thresholds: `lib/portalcore/include/recovery.h`) |
 | `src/board.h`, `src/boards/` | The board being built (from its env in `platformio.ini`): pins, LED, setup button |
-| `src/p1_reader.c` | UART on the board's P1 pin (inverted) → framer → broadcast; per-minute stats |
+| `src/p1_reader.c` | UART on the board's P1 pin (inverted) → framer → broadcast, then the values for the status page; per-minute stats |
 | `src/tcp_server.c` | TCP server: client slots (oldest evicted when full), non-blocking sends |
 | `src/wifi.c` | Station with back-off and recovery counters; setup hotspot; scans |
 | `src/wifi_credentials.c` | The saved network (NVS, written by the setup portal) |
 | `src/setup_button.c` | BOOT long-press, polled from the LED tick (nothing on a board without a button) |
 | `src/setup_portal.c` | Setup request/restart; setup boot: hotspot, web form, captive DNS, timeout |
+| `src/status_page.c` | Normal mode: web server with the status page and `/api/status` |
+| `src/web.c` | What both web servers share: the built pages, the language choice, sending |
 | `src/mdns_announce.c` | mDNS hostname + service |
 | `src/status_led.c` | LED patterns; 125 ms tick also polls the button |
-| `web/` | Setup pages, written once in English: text marked `[[like this]]` is translated with `nl.json`, shared pieces live in `parts/`. Built into the firmware gzipped, in English and Dutch |
-| `lib/p1core/` | Pure C: `crc16`, `p1_framer`, `p1_ident` (the meter's type name, for the log), `p1_parse` (the values in a telegram: readings, power, voltage, current, gas) |
-| `lib/portalcore/` | Pure C: `wifi_form`, `captive_dns`, `channel_pick`, `json_escape`, `lang_pick`, `setup_state` (network list, page JSON), `recovery` |
+| `web/` | The pages, in the look of piepr.nl, written once in English: text marked `[[like this]]` is translated with `nl.json`; the head, stylesheets, pulse line and script helpers they share live in `parts/`. Built into the firmware in English and Dutch, minified (comments and spare whitespace out) and gzipped |
+| `lib/p1core/` | Pure C: `crc16`, `p1_framer`, `p1_ident` (the meter's type name, for the log), `p1_parse` (the values in a telegram: readings, power, voltage, current, gas), `p1_status` (what the reader knows at one moment) |
+| `lib/portalcore/` | Pure C: `wifi_form`, `captive_dns`, `channel_pick`, `json_escape`, `json_writer`, `lang_pick`, `setup_state` (network list, page JSON), `status_json` (the status page's JSON), `recovery` |
 | `test/` | Unity tests, one folder per module (`pio test -e native`) |
 | `fuzz/` | libFuzzer harnesses: `fuzz/run.sh <target> [seconds]` |
-| `scripts/` | Build steps: `gen_secrets.py`, `gen_version.py`, `gen_web.py` (with `web_pages.py` and its tests), `gen_common.py`, `native_sanitizers.py`; `release_image.sh` makes the release file; `format.sh` formats the C code |
+| `scripts/` | Build steps: `gen_secrets.py`, `gen_version.py`, `gen_web.py` (with `web_pages.py`, `web_minify.py` and their tests), `gen_common.py`, `native_sanitizers.py`; `release_image.sh` makes the release file; `format.sh` formats the C code |
 | `sdkconfig.defaults` | ESP-IDF options for every board (explained in the file) |
 | `dependencies.lock.<chip>` | Pinned component versions, one file per chip (`esp32c3`, `esp32s3`) |
 | `partitions.csv` | Flash layout, the same on every board: two firmware slots and the settings |
@@ -154,6 +194,8 @@ Adding a board:
 
 ## Security
 - The TCP stream is **plain text without authentication** on your LAN, by design.
+  The status page shows the same readings, also without a sign-in, and can't change
+  anything.
 - WiFi and setup passwords are in flash; physical USB access can read them.
 - The setup hotspot (WPA2) only exists in setup mode.
 
@@ -168,7 +210,8 @@ The log lines are explained in the [log reference](docs/log-reference.md).
 | Network missing from the setup list | 5 GHz only, weak signal, hidden SSID (use *Other network…*), or a non-UTF-8 name (rename it) |
 | Setup page doesn't open | forget `Piepr-Setup` on the phone and rejoin, or browse to `http://192.168.4.1` |
 | Build fails: `setup_pass … must be 8-63 bytes` | set `setup_pass` in `secrets.ini` |
-| No values in your software | right DSMR version, port 8088; does `nc piepr.local 8088` work? |
+| No values in your software | does `http://piepr.local` show a last telegram of seconds ago? Then: right DSMR version, port 8088; does `nc piepr.local 8088` work? |
+| Status page doesn't open | only in normal mode (light on, not blinking); try the IP address instead of `piepr.local` |
 | Build fails after an ESP-IDF / `sdkconfig.defaults` change | clean build (see Configuration) |
 
 ## More

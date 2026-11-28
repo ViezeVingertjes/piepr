@@ -17,6 +17,7 @@
 #include "setup_button.h"
 #include "setup_portal.h"
 #include "status_led.h"
+#include "status_page.h"
 #include "tcp_server.h"
 #include "version_gen.h"
 #include "wifi.h"
@@ -191,6 +192,7 @@ void app_main(void)
     mdns_announce_start();
     tcp_server_start();
     p1_reader_start();
+    status_page_start();
     if (nvs_ok) {
         setup_button_init();
     }

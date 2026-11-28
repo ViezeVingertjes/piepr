@@ -1,27 +1,19 @@
 <!doctype html>
 <html lang="[[@lang]]">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<style>
-:root{--bg:#e9eef3;--ink:#0e2236;--act:#0e2236}
-@media (prefers-color-scheme:dark){:root{--bg:#0b1a2a;--ink:#e9eef3;--act:#ffc21a}}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:30rem;margin:0 auto;padding:1.25rem 1rem 2rem}
-.brand{display:block;height:1.5rem;width:auto;margin:0 0 1rem}
-h1{font-size:1.75rem;line-height:1.15;letter-spacing:-.02em;margin:0 0 1rem}
-a{color:var(--act);font-weight:600}
-</style>
+[[>head]]
 <title>[[Piepr: not saved]]</title>
-[[>favicon]]
 </head>
 <body>
-<main>
-[[>brand]]
-<h1>[[Not saved]]</h1>
-<p>[[Name: 1&ndash;32 characters. Password: 8&ndash;63 characters, or empty for an open network.]]</p>
-<p><a href="/?lang=[[@lang]]">[[Back to setup]]</a></p>
+<header class="field">
+  <div class="wrap">
+    <div class="top">[[>brand]]</div>
+    <h1>[[Not saved]]</h1>
+  </div>
+</header>
+<main class="wrap">
+  <p>[[Name: 1&ndash;32 characters. Password: 8&ndash;63 characters, or empty for an open network.]]</p>
+  <div class="actions"><a class="btn" href="/?lang=[[@lang]]">[[Back to setup]]</a></div>
 </main>
 </body>
 </html>

@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- A status page on the device: open `http://piepr.local` for the power right now, per
+  phase, the meter readings and gas, and how Piepr itself is doing: when the last
+  telegram came, how many arrived and how many were rejected, readers, WiFi signal,
+  uptime. Old values are dimmed and what is wrong is shown in red. In English and
+  Dutch, on a phone and on a computer; the same facts as JSON at `/api/status`
+- The setup page looks like [piepr.nl](https://piepr.nl) now, and so does the status
+  page: the same colours, type, buttons and pulse line, in light and dark
+- After saving WiFi, the setup page points at the status page
+- The pages are built from shared pieces, and comments and spare whitespace are left
+  out of what goes into the firmware
+
 ## 1.3.0 - 2026-11-28
 
 - A circuit board for the same parts, with an RJ12 socket: [hardware/pcb](hardware/pcb)

@@ -1,27 +1,20 @@
 <!doctype html>
 <html lang="[[@lang]]">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<style>
-:root{--bg:#e9eef3;--ink:#0e2236;--muted:#55657a}
-@media (prefers-color-scheme:dark){:root{--bg:#0b1a2a;--ink:#e9eef3;--muted:#93a3b5}}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:30rem;margin:0 auto;padding:1.25rem 1rem 2rem}
-.brand{display:block;height:1.5rem;width:auto;margin:0 0 1rem}
-h1{font-size:1.75rem;line-height:1.15;letter-spacing:-.02em;margin:0 0 1rem}
-.muted{color:var(--muted)}
-</style>
+[[>head]]
 <title>[[Piepr: saved]]</title>
-[[>favicon]]
 </head>
 <body>
-<main>
-[[>brand]]
-<h1>[[Saved]]</h1>
-<p>[[Piepr is joining your network. When its light stays on, it’s connected.]]</p>
-[[>after-save]]
+<header class="field">
+  <div class="wrap">
+    <!-- No link to the other language: the device restarts now. -->
+    <div class="top">[[>brand]]</div>
+    <h1>[[Saved]]</h1>
+  </div>
+</header>
+<main class="wrap">
+  <p>[[Piepr is joining your network. When its light stays on, it’s connected.]]</p>
+  [[>after-save]]
 </main>
 </body>
 </html>
