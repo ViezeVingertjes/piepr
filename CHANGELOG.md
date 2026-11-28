@@ -1,10 +1,12 @@
 # Changelog
 
-## Unreleased
+## 1.3.0 - 2026-11-28
 
 - A circuit board for the same parts, with an RJ12 socket: [hardware/pcb](hardware/pcb)
 - Also runs on the Seeed Studio XIAO ESP32-S3 ([build guide](hardware/README.md))
 - The release has one file per board, such as `piepr-supermini-<version>.bin`
+- Installing 1.3.0 goes over USB, from [piepr.nl/installeren](https://piepr.nl/installeren/)
+  or by hand, and clears the saved WiFi network: set it up again from your phone
 
 ## 1.2.1 - 2026-11-27
 
