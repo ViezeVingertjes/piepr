@@ -18,6 +18,8 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
 - Geeft de ruwe telegrammen door op `piepr.local`, poort `8088`, aan alle software
   die P1-data leest: Home Assistant (DSMR Smart Meter), Domoticz (P1 Smart Meter with
   LAN interface), DSMR-reader of je eigen script; tot 5 tegelijk
+- Een statuspagina op `http://piepr.local`: leest hij de meter, het vermogen van dit
+  moment, de meterstanden
 - Wifi stel je in op je telefoon: je kiest uit een lijst met netwerken in de buurt
 - Herstelt zichzelf: komt hij niet op je wifi, dan komt de setup-hotspot terug en zie
   je waarom
@@ -39,7 +41,8 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
    `http://192.168.4.1` terwijl je telefoon op Piepr-Setup zit).
 3. Kies je thuisnetwerk, vul het wachtwoord in en sla op. Piepr werkt alleen met
    **2,4 GHz**-wifi.
-4. Als het lampje **blijft branden**, is Piepr verbonden.
+4. Als het lampje **blijft branden**, is Piepr verbonden. Open `http://piepr.local` in
+   een browser om te zien wat je meter aangeeft.
 5. Vul in je software `piepr.local` in, met poort `8088`. In Home Assistant:
    Instellingen → Apparaten & diensten → Integratie toevoegen → DSMR Smart Meter →
    Netwerk. DSMR-versie: 4 of 5, staat meestal op de voorkant van de meter; 5B in
@@ -47,6 +50,10 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
 
 Later een ander wifi-netwerk instellen? Houd de **BOOT**-knop ingedrukt tot het lampje
 dubbel knippert (ongeveer 5 seconden).
+
+<p align="center">
+  <img src="assets/status-page.nl.png" alt="De statuspagina van Piepr op een computer en op een telefoon: 412 W verbruik op dit moment, de meterstanden en hoeveel telegrammen er binnenkwamen" width="820">
+</p>
 
 | Lampje | Betekenis |
 |---|---|

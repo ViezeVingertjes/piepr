@@ -1,6 +1,8 @@
-# PlatformIO pre-build script: web/ -> src/web_pages_gen.inc, the setup pages as
-# C arrays (gzipped, in English and Dutch) for src/setup_portal.c. The work is
-# done by web_pages.py; a problem in web/ stops the build with its message.
+# PlatformIO pre-build script: web/ -> the pages as C arrays (gzipped, in English
+# and Dutch). Page "setup" becomes WEB_PAGE_SETUP: defined in
+# src/web_pages_gen.inc, which only src/web.c includes, and declared in
+# src/web_pages_gen.h, for src/web.h. The work is done by web_pages.py; a problem
+# in web/ stops the build with its message.
 import os
 import sys
 
@@ -26,14 +28,19 @@ try:
 except PageError as error:
     raise SystemExit(str(error))
 
-out = ["/* Generated from web/ by scripts/gen_web.py - do not edit or commit. */\n"]
+GENERATED = "/* Generated from web/ by scripts/gen_web.py - do not edit or commit. */\n"
+defined = [GENERATED]
+declared = [GENERATED]
 for name, versions in pages.items():
-    out.append(c_array("PAGE_%s_en" % name, versions["en"]))
-    out.append(c_array("PAGE_%s_nl" % name, versions["nl"]))
-    out.append(
-        "static const localized_page_t PAGE_%s = {\n"
+    page = name.replace("-", "_")  # a file name as a C name
+    defined.append(c_array("PAGE_%s_en" % page, versions["en"]))
+    defined.append(c_array("PAGE_%s_nl" % page, versions["nl"]))
+    defined.append(
+        "const web_page_t WEB_PAGE_%s = {\n"
         "    { PAGE_%s_en, sizeof(PAGE_%s_en) },\n"
         "    { PAGE_%s_nl, sizeof(PAGE_%s_nl) },\n"
-        "};\n" % ((name,) * 5)
+        "};\n" % ((page.upper(),) + (page,) * 4)
     )
-write_if_changed(os.path.join(PROJECT, "src", "web_pages_gen.inc"), "\n".join(out))
+    declared.append("extern const web_page_t WEB_PAGE_%s;\n" % page.upper())
+write_if_changed(os.path.join(PROJECT, "src", "web_pages_gen.inc"), "\n".join(defined))
+write_if_changed(os.path.join(PROJECT, "src", "web_pages_gen.h"), "".join(declared))

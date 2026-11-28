@@ -18,10 +18,10 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "lang_pick.h"
 #include "lwip/sockets.h"
 #include "setup_state.h"
 #include "status_led.h"
+#include "web.h"
 #include "wifi.h"
 #include "wifi_credentials.h"
 #include "wifi_form.h"
@@ -33,27 +33,16 @@
 #define DNS_TASK_STACK        (3072 + 2 * CAPTIVE_DNS_MAX_PACKET)
 #define DNS_TASK_PRIO         4
 #define DNS_ERROR_BACKOFF_MS  100
-#define HTTP_MAX_SOCKETS      4 /* of LWIP_MAX_SOCKETS 10, leaving headroom */
+#define HTTP_MAX_SOCKETS      4 /* phones on the setup page and their probes */
 #define MAX_FORM_BODY         512
 #define MAX_RECV_TIMEOUTS     3
 #define RESTART_AFTER_SAVE_MS 1000
 #define TIMEOUT_CHECK_MS      1000
-#define ACCEPT_LANGUAGE_MAX   96 /* the start of the header is what decides */
-#define LANG_QUERY_MAX        16 /* "lang=nl"; a longer query is none of ours */
+
+_Static_assert(HTTP_MAX_SOCKETS + HTTPD_OWN_SOCKETS + 1 <= CONFIG_LWIP_MAX_SOCKETS,
+               "the setup page's sockets and the DNS socket must fit lwIP's");
 
 static const char *TAG = LOG_TAG_SETUP;
-
-/* The setup pages of web/, gzipped, each in English and Dutch. The generated
- * file defines one localized_page_t per page: PAGE_setup, PAGE_saved, ... */
-typedef struct {
-    const uint8_t *data;
-    size_t len;
-} page_t;
-typedef struct {
-    page_t english;
-    page_t dutch;
-} localized_page_t;
-#include "web_pages_gen.inc"
 
 /* Carries a setup request across esp_restart() (lost on power-up/RST). */
 typedef struct {
@@ -108,44 +97,15 @@ bool setup_portal_requested(void)
 
 /* ---- Setup boot: web form ---------------------------------------------- */
 
-static esp_err_t send_response(httpd_req_t *req, const char *status, const char *type,
-                               const void *body, size_t len)
+/* Someone is using the page: the setup window stays open. */
+static void note_activity(void)
 {
     atomic_store(&s_last_activity_us, esp_timer_get_time());
-    httpd_resp_set_status(req, status);
-    httpd_resp_set_type(req, type);
-    httpd_resp_set_hdr(req, "Cache-Control", "no-store");
-    return httpd_resp_send(req, body, (ssize_t)len);
-}
-
-/* The language chosen with the link on the page ("?lang=nl") wins; without one,
- * Dutch for a browser that asks for it (Accept-Language) and English otherwise. */
-static bool wants_dutch(httpd_req_t *req)
-{
-    char query[LANG_QUERY_MAX] = { 0 };
-    if (httpd_req_get_url_query_str(req, query, sizeof(query)) == ESP_OK) {
-        lang_choice_t chosen = lang_from_query(query, strnlen(query, sizeof(query)));
-        if (chosen != LANG_UNSET) {
-            return chosen == LANG_DUTCH;
-        }
-    }
-    char header[ACCEPT_LANGUAGE_MAX] = { 0 };
-    esp_err_t err = httpd_req_get_hdr_value_str(req, "Accept-Language", header, sizeof(header));
-    if (err != ESP_OK && err != ESP_ERR_HTTPD_RESULT_TRUNC) {
-        return false;
-    }
-    return lang_prefers_dutch(header, strnlen(header, sizeof(header)));
-}
-
-static esp_err_t send_page(httpd_req_t *req, const char *status, const localized_page_t *pages)
-{
-    const page_t *page = wants_dutch(req) ? &pages->dutch : &pages->english;
-    httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-    return send_response(req, status, "text/html; charset=utf-8", page->data, page->len);
 }
 
 static esp_err_t handle_state(httpd_req_t *req)
 {
+    note_activity();
     char *json = malloc(SETUP_STATE_JSON_MAX);
     if (json == NULL) {
         return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Out of memory");
@@ -156,7 +116,7 @@ static esp_err_t handle_state(httpd_req_t *req)
                                   portal->networks, scanning ? 0 : portal->network_count, scanning,
                                   json, SETUP_STATE_JSON_MAX);
     esp_err_t err =
-        len > 0 ? send_response(req, HTTPD_200, "application/json", json, len)
+        len > 0 ? web_send(req, HTTPD_200, "application/json", json, len)
                 : httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "State too large");
     free(json);
     return err;
@@ -187,14 +147,16 @@ static esp_err_t handle_scan(httpd_req_t *req)
 
 static esp_err_t handle_form(httpd_req_t *req)
 {
-    return send_page(req, HTTPD_200, &PAGE_setup);
+    note_activity();
+    return web_send_page(req, HTTPD_200, &WEB_PAGE_SETUP);
 }
 
 static esp_err_t handle_save(httpd_req_t *req)
 {
+    note_activity();
     char body[MAX_FORM_BODY];
     if (req->content_len > sizeof(body)) {
-        return send_page(req, HTTPD_400, &PAGE_invalid);
+        return web_send_page(req, HTTPD_400, &WEB_PAGE_INVALID);
     }
     size_t received = 0;
     int timeouts = 0;
@@ -211,7 +173,7 @@ static esp_err_t handle_save(httpd_req_t *req)
 
     wifi_credentials_t creds;
     if (wifi_form_parse(body, received, &creds) != WIFI_FORM_OK) {
-        return send_page(req, HTTPD_400, &PAGE_invalid);
+        return web_send_page(req, HTTPD_400, &WEB_PAGE_INVALID);
     }
     esp_err_t err = wifi_credentials_save(&creds);
     if (err != ESP_OK) {
@@ -219,7 +181,7 @@ static esp_err_t handle_save(httpd_req_t *req)
         return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Saving failed");
     }
     ESP_LOGI(TAG, "saved WiFi settings for \"%s\", restarting", creds.ssid);
-    send_page(req, HTTPD_200, &PAGE_saved);
+    web_send_page(req, HTTPD_200, &WEB_PAGE_SAVED);
     vTaskDelay(pdMS_TO_TICKS(RESTART_AFTER_SAVE_MS)); /* let the page reach the phone */
     esp_restart();
 }
@@ -236,21 +198,11 @@ static esp_err_t handle_redirect(httpd_req_t *req)
 
 static void start_http_server(portal_t *portal)
 {
-    /* Phones that probe for internet drop connections all the time: the web
-     * server's warnings about that are not worth a line in the log. */
-    static const char *const SERVER_TAGS[] = { "httpd_txrx", "httpd_parse", "httpd_sess",
-                                               "httpd_uri" };
-    for (size_t i = 0; i < sizeof(SERVER_TAGS) / sizeof(SERVER_TAGS[0]); i++) {
-        esp_log_level_set(SERVER_TAGS[i], ESP_LOG_ERROR);
-    }
-
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.uri_match_fn = httpd_uri_match_wildcard;
     config.lru_purge_enable = true; /* phones open many probe connections */
     config.max_open_sockets = HTTP_MAX_SOCKETS;
 
-    httpd_handle_t server;
-    ESP_ERROR_CHECK(httpd_start(&server, &config));
     const httpd_uri_t uris[] = {
         { .uri = "/", .method = HTTP_GET, .handler = handle_form },
         { .uri = "/save", .method = HTTP_POST, .handler = handle_save },
@@ -258,9 +210,7 @@ static void start_http_server(portal_t *portal)
         { .uri = "/api/scan", .method = HTTP_POST, .handler = handle_scan, .user_ctx = portal },
         { .uri = "/*", .method = HTTP_GET, .handler = handle_redirect, .user_ctx = portal },
     };
-    for (size_t i = 0; i < sizeof(uris) / sizeof(uris[0]); i++) {
-        ESP_ERROR_CHECK(httpd_register_uri_handler(server, &uris[i]));
-    }
+    ESP_ERROR_CHECK(web_start(&config, uris, sizeof(uris) / sizeof(uris[0])));
 }
 
 /* ---- Setup boot: captive portal plumbing -------------------------------- */

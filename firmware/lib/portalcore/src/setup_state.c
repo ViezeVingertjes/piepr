@@ -1,8 +1,8 @@
 #include "setup_state.h"
 
-#include <stdarg.h>
-#include <stdio.h>
 #include <string.h>
+
+#include "json_writer.h"
 
 /* Names the page can show and post back unchanged. */
 static bool ssid_usable(const char *ssid, size_t len)
@@ -107,43 +107,6 @@ void setup_survey_result(const setup_survey_entry_t *survey, size_t count, setup
     }
 }
 
-typedef struct {
-    char *buf;
-    size_t size;
-    size_t len;
-    bool overflow;
-} writer_t;
-
-static void put(writer_t *w, const char *fmt, ...)
-{
-    if (w->overflow) {
-        return;
-    }
-    va_list ap;
-    va_start(ap, fmt);
-    int n = vsnprintf(&w->buf[w->len], w->size - w->len, fmt, ap);
-    va_end(ap);
-    if (n < 0 || (size_t)n >= w->size - w->len) {
-        w->overflow = true;
-    } else {
-        w->len += (size_t)n;
-    }
-}
-
-/* Writes `s` (at most WIFI_SSID_MAX_LEN bytes of it) as a JSON string. */
-static void put_string(writer_t *w, const char *s)
-{
-    const char *nul = memchr(s, '\0', WIFI_SSID_MAX_LEN);
-    size_t len = nul != NULL ? (size_t)(nul - s) : WIFI_SSID_MAX_LEN;
-    put(w, "\"");
-    if (w->overflow || !json_escape(s, len, &w->buf[w->len], w->size - w->len)) {
-        w->overflow = true;
-        return;
-    }
-    w->len += strlen(&w->buf[w->len]);
-    put(w, "\"");
-}
-
 const char *setup_reason_name(setup_reason_t reason)
 {
     switch (reason) {
@@ -160,22 +123,17 @@ const char *setup_reason_name(setup_reason_t reason)
 size_t setup_state_json(setup_reason_t reason, const char *reason_ssid, const setup_network_t *nets,
                         size_t count, bool scanning, char *out, size_t out_size)
 {
-    if (out_size == 0) {
-        return 0;
-    }
-    writer_t w = { .buf = out, .size = out_size };
-    put(&w, "{\"reason\":\"%s\",\"reason_ssid\":", setup_reason_name(reason));
-    put_string(&w, reason_ssid != NULL ? reason_ssid : "");
-    put(&w, ",\"scanning\":%s,\"networks\":[", scanning ? "true" : "false");
+    json_writer_t w;
+    json_writer_init(&w, out, out_size);
+    json_put(&w, "{\"reason\":\"%s\",\"reason_ssid\":", setup_reason_name(reason));
+    json_put_string(&w, reason_ssid != NULL ? reason_ssid : "", WIFI_SSID_MAX_LEN);
+    json_put(&w, ",\"scanning\":%s,\"networks\":[", scanning ? "true" : "false");
     for (size_t i = 0; i < count; i++) {
-        put(&w, "%s{\"ssid\":", i > 0 ? "," : "");
-        put_string(&w, nets[i].ssid);
-        put(&w, ",\"rssi\":%d,\"secure\":%s}", nets[i].rssi, nets[i].secure ? "true" : "false");
+        json_put(&w, "%s{\"ssid\":", i > 0 ? "," : "");
+        json_put_string(&w, nets[i].ssid, WIFI_SSID_MAX_LEN);
+        json_put(&w, ",\"rssi\":%d,\"secure\":%s}", nets[i].rssi,
+                 nets[i].secure ? "true" : "false");
     }
-    put(&w, "]}");
-    if (w.overflow) {
-        out[0] = '\0';
-        return 0;
-    }
-    return w.len;
+    json_put(&w, "]}");
+    return json_writer_finish(&w);
 }

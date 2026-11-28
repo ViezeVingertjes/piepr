@@ -12,6 +12,14 @@ without anyone looking at it.
   clients that send data are disconnected; keepalive finds dead clients (~60 s);
   when full, the oldest client makes room. Half-closed clients (`nc … < /dev/null`)
   are dropped by keepalive while the meter is silent, by design.
+- Status page: a telegram goes to the readers first and is only then parsed for the
+  page; the counts and values are one record behind a lock that is held just long
+  enough to change or copy it. The
+  web server's task runs below the reader's and the stream's, takes 3 browsers (a 4th
+  replaces the one idle longest) and answers from one fixed buffer. If it can't start,
+  the stream works without it; a browser that stalls is dropped after 3 seconds. The
+  page asks for `/api/status` every 2 seconds, one request at a time, and not while
+  its tab is hidden.
 - WiFi: strongest AP for the SSID; reconnects forever with back-off; a lost IP
   forces a fresh connect; restart after 15 min offline; [automatic recovery](../README.md#automatic-recovery).
 - Silent failures: restart if readers were seen and none for 30 min while

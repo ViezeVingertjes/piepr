@@ -1,0 +1,163 @@
+/* What every Piepr page starts from, in the look of piepr.nl: its colours
+ * (following the light or dark theme), its type, the coloured band at the top
+ * with the name in it, and its buttons. */
+:root {
+  --volt: #ffc21a;
+  --ink: #0e2236;
+  --pulse: #ff4b3e; /* the dot on the i: the one red thing */
+  --bg: #fff;
+  --text: var(--ink);
+  --muted: #55657a;
+  --line: #d3dbe3;
+  --accent: var(--ink); /* the name, rules, buttons */
+  --on-accent: var(--volt);
+  --field: var(--volt); /* the band at the top */
+  --on-field: var(--ink);
+  --field-line: rgba(14, 34, 54, .25);
+  --err: #b3261e;
+  --gutter: 1.25rem;
+  --page: 30rem; /* how wide the text gets */
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1a2a;
+    --text: #e9eef3;
+    --muted: #93a3b5;
+    --line: #22394f;
+    --accent: var(--volt);
+    --on-accent: var(--ink);
+    --field: var(--ink);
+    --on-field: #e9eef3;
+    --field-line: rgba(233, 238, 243, .2);
+    --err: #ff8a80;
+  }
+}
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 3rem;
+  }
+}
+
+/* Ubuntu, the website's typeface, where it is installed; elsewhere the system's
+ * own. Windows' Segoe UI has no medium weight: these two rules let its semibold
+ * stand in. Where Segoe UI is missing they are skipped. */
+@font-face {
+  font-family: Segoe;
+  src: local("Segoe UI");
+}
+@font-face {
+  font-family: Segoe;
+  font-weight: 500;
+  src: local("Segoe UI Semibold");
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 1.0625rem/1.5 Ubuntu, Segoe, system-ui, -apple-system, Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+/* Everything starts at the same distance from the edge. */
+.wrap {
+  max-width: calc(var(--page) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+.field {
+  --line: var(--field-line);
+  padding-bottom: 1.75rem;
+  background: var(--field);
+  color: var(--on-field);
+}
+main {
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+}
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.25rem;
+}
+.brand {
+  display: block;
+  width: 6.5rem;
+  height: auto;
+  color: var(--accent);
+}
+
+h1 {
+  margin: 1.75rem 0 0;
+  font-size: 2.125rem;
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -.025em;
+  text-wrap: balance;
+}
+@media (min-width: 48rem) {
+  .top {
+    padding-top: 2rem;
+  }
+  h1 {
+    font-size: 2.75rem;
+  }
+}
+p {
+  margin: 0 0 1rem;
+}
+b,
+strong {
+  font-weight: 500;
+}
+/* A name to type in, as the device spells it. */
+code {
+  font: 1.06em "Ubuntu Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+.muted {
+  color: var(--muted);
+}
+
+/* A link or a button; both look the same. The quiet one is only an outline. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: .7em 1.35em;
+  border: 3px solid var(--accent);
+  border-radius: .5rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-quiet {
+  background: none;
+  color: var(--accent);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: 1.25rem;
+}
+/* On a phone the buttons are as wide as the page. */
+@media (max-width: 30rem) {
+  .actions .btn {
+    flex: 1 1 12rem;
+  }
+}
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}

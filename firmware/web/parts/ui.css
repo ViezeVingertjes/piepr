@@ -1,0 +1,92 @@
+/* The pieces the setup page and the status page are built from. */
+
+/* The two languages in the bar at the top: Nederlands first, this page's underlined. */
+.lang {
+  display: flex;
+  gap: 1.1em;
+  font-size: .9375rem;
+}
+.lang > * {
+  padding: .3em 0;
+  border-bottom: 3px solid transparent;
+  color: inherit;
+  text-decoration: none;
+}
+.lang b {
+  border-bottom-color: currentColor;
+}
+.lang [lang=nl] {
+  order: -1;
+}
+
+/* `hidden` wins from any display a class sets. */
+[hidden] {
+  display: none !important;
+}
+
+h2 {
+  margin: 0 0 .75rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+}
+.hint {
+  margin: .75rem 0;
+  color: var(--muted);
+  font-size: .9375rem;
+}
+
+/* A table without sides: a rule on top, a thin line under every row. */
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 3px solid var(--accent);
+}
+.rows > * {
+  border-bottom: 1px solid var(--line);
+}
+/* A row that says what something is, and its value. */
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .7rem 0;
+}
+.row dd {
+  min-width: 0;
+  margin: 0;
+  font-weight: 500;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* WiFi signal, as four bars. */
+.bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+.bars b {
+  width: 4px;
+  background: var(--line);
+  border-radius: 1px;
+}
+.bars b:nth-child(1) {
+  height: 25%;
+}
+.bars b:nth-child(2) {
+  height: 50%;
+}
+.bars b:nth-child(3) {
+  height: 75%;
+}
+.bars b:nth-child(4) {
+  height: 100%;
+}
+.bars b.on {
+  background: var(--text);
+}

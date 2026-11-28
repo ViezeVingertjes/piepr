@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="[[@lang]]">
+<head>
+[[>head]]
+<title>Piepr</title>
+<style>
+[[>ui.css]]
+
+:root {
+  --page: 60rem;
+}
+/* For a screen reader only. */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Two columns from a tablet up: in the band at the top the power and its phases,
+ * under it the meter and Piepr. */
+.cols {
+  display: grid;
+  gap: 2.5rem 4rem;
+}
+@media (min-width: 48rem) {
+  .cols {
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+  }
+  main .cols {
+    align-items: start;
+  }
+}
+.hero {
+  margin-top: 2rem;
+}
+/* A number stays in one piece: on a narrow screen its name wraps instead. */
+dd {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+dd.text {
+  flex: 0 1 auto;
+  white-space: normal;
+}
+
+/* The power right now: the one large figure on the page. */
+.power {
+  margin: 0;
+}
+.power dt {
+  margin-bottom: .75rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+.power dd {
+  margin: 0;
+  font-size: 4.25rem;
+  font-size: clamp(4.25rem, 3rem + 6vw, 7rem);
+  font-weight: 500;
+  line-height: .8; /* its box ends at the foot of the digits: level with the last phase */
+  letter-spacing: -.04em;
+}
+/* A phase: its name, then power, voltage and current in columns. */
+.phase {
+  display: grid;
+  grid-template-columns: 2rem;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+.phase dd + dd {
+  font-weight: 400;
+}
+
+/* The pulse line closes the band; it runs in from the left once, on load. */
+.pulse {
+  overflow: hidden;
+  margin-top: 2.25rem;
+  color: var(--accent);
+}
+.pulse svg {
+  display: block;
+  width: auto;
+  height: 2rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pulse path {
+    stroke-dasharray: 1;
+    animation: run-in 5s linear both;
+  }
+  .beat {
+    animation: beat .7s ease-out;
+  }
+}
+@keyframes run-in {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes beat {
+  from {
+    box-shadow: 0 0 0 0 rgba(255, 75, 62, .55);
+  }
+  to {
+    box-shadow: 0 0 0 .55rem rgba(255, 75, 62, 0);
+  }
+}
+.bars {
+  margin-right: .5rem;
+}
+
+/* No headline says how things are; the page shows it. <body> carries one of:
+ *   starting  no telegram yet, soon after start-up
+ *   reading   telegrams arrive: a dot beats next to "Last telegram"
+ *   quiet     none for a while: that row turns red, the meter's values are dimmed
+ *   gone      Piepr doesn't answer: a line says so, and everything is dimmed
+ *   old       the page was out of sight for a while: dimmed until the next answer */
+.dot {
+  display: none;
+  width: .6rem;
+  height: .6rem;
+  margin-right: .5rem;
+  border-radius: 50%;
+  background: var(--pulse);
+}
+.reading .dot {
+  display: inline-block;
+}
+.bad,
+.quiet #last-cell {
+  color: var(--err);
+}
+.quiet .hero,
+.quiet #readings,
+.gone .hero,
+.gone #values,
+.old .hero,
+.old #values {
+  opacity: .45;
+}
+#gone {
+  display: none;
+  margin-bottom: 2.5rem;
+}
+.gone #gone {
+  display: block;
+}
+.foot {
+  margin: 2.5rem 0 0;
+}
+</style>
+</head>
+<body>
+<header class="field">
+  <div class="wrap">
+    [[>top]]
+    <h1 class="sr">[[What the meter says now]]</h1>
+    <div class="cols hero">
+      <dl class="power"><dt id="now-label">[[Using now]]</dt><dd id="now">–</dd></dl>
+      <dl class="rows" id="phases" hidden>
+        <div class="row phase"><dt>L1</dt><dd></dd><dd></dd><dd></dd></div>
+        <div class="row phase"><dt>L2</dt><dd></dd><dd></dd><dd></dd></div>
+        <div class="row phase"><dt>L3</dt><dd></dd><dd></dd><dd></dd></div>
+      </dl>
+    </div>
+  </div>
+  [[>pulse]]
+</header>
+<main class="wrap">
+<noscript><p>[[This page needs JavaScript. The same values are at]] <a href="/api/status">/api/status</a>.</p></noscript>
+<p id="old" hidden>[[This page needs a newer browser.]]</p>
+<dl class="rows bad" id="gone">
+  <div class="row"><dt>[[Connection to Piepr]]</dt><dd>[[lost, trying again]]</dd></div>
+</dl>
+<div class="cols" id="values" hidden>
+  <section id="meter" hidden>
+    <h2>[[Meter readings]]</h2>
+    <dl class="rows" id="readings">
+      <div class="row" id="row-t1"><dt>[[Used, tariff 1]]<span class="muted" hidden> ([[now]])</span></dt><dd id="t1"></dd></div>
+      <div class="row" id="row-t2"><dt>[[Used, tariff 2]]<span class="muted" hidden> ([[now]])</span></dt><dd id="t2"></dd></div>
+      <div class="row" id="row-r1"><dt>[[Returned, tariff 1]]<span class="muted" hidden> ([[now]])</span></dt><dd id="r1"></dd></div>
+      <div class="row" id="row-r2"><dt>[[Returned, tariff 2]]<span class="muted" hidden> ([[now]])</span></dt><dd id="r2"></dd></div>
+      <div class="row" id="row-gas"><dt id="gas-label"></dt><dd id="gas"></dd></div>
+      <div class="row"><dt>Meter</dt><dd class="text" id="meter-name"></dd></div>
+      <div class="row" id="row-dsmr"><dt>[[DSMR version]]</dt><dd id="dsmr"></dd></div>
+    </dl>
+  </section>
+  <section>
+    <h2>Piepr</h2>
+    <dl class="rows">
+      <div class="row"><dt>[[Last telegram]]</dt><dd id="last-cell"><i class="dot" id="dot"></i><span id="last"></span></dd></div>
+      <div class="row"><dt>[[Telegrams received]]</dt><dd id="ok"></dd></div>
+      <div class="row"><dt>[[Rejected as damaged]]</dt><dd id="bad"></dd></div>
+      <div class="row"><dt>[[Readers connected]]</dt><dd id="readers"></dd></div>
+      <div class="row"><dt>[[WiFi signal]]</dt><dd id="wifi"></dd></div>
+      <div class="row"><dt>[[Running for]]</dt><dd id="uptime"></dd></div>
+      <div class="row"><dt>Firmware</dt><dd id="firmware"></dd></div>
+    </dl>
+  </section>
+</div>
+<p class="hint foot">[[Software reads the meter at]] <code>piepr.local</code>[[, port]] <code>8088</code>.</p>
+</main>
+<script>
+(function () {
+  "use strict";
+  [[>dom.js]]
+  [[>bars.js]]
+  var POLL_MS = 2000;    /* a meter sends a telegram every second, or every ten */
+  var TIMEOUT_MS = 4000; /* a request that takes longer has failed */
+  var FAILS = 2;         /* requests in a row that fail before the page says so */
+  var QUIET_MS = 30000;  /* without a telegram for this long, the meter isn't being read */
+  var LANG = "[[@lang]]";
+  var NONE = "–";
+  var busy = false, fails = 0;
+  var answeredAt = 0; /* when Piepr last answered */
+  var shown = null; /* the count of telegrams at which the meter's values on the page were filled in */
+  var rssi = null;  /* the signal the bars on the page stand for */
+  var formats = {}; /* a number format per number of decimals, made once */
+
+  if (!window.fetch || !window.AbortController) {
+    $("old").hidden = false;
+    return;
+  }
+
+  /* 1234.5 the way the reader's language writes it, with `digits` decimals (but no
+   * fewer than `least`) and `unit` after it; a dash for a value that isn't there.
+   * \u2212 is a minus sign, \u00a0 a space that keeps the unit on the number's line. */
+  function number(value, unit, digits, least) {
+    if (value === undefined) { return NONE; }
+    if (least === undefined) { least = digits; }
+    var key = digits * 10 + least;
+    formats[key] = formats[key] ||
+      new Intl.NumberFormat(LANG, { minimumFractionDigits: least, maximumFractionDigits: digits });
+    return formats[key].format(value).replace("-", "\u2212") + (unit ? "\u00a0" + unit : "");
+  }
+  var scaled = function (value, by) { return value === undefined ? value : value / by; };
+  var missing = function (value) { return value === undefined; };
+
+  /* A length of time: "42 s", "12 min", "4 h 12 min", "3 d 4 h". */
+  function span(s) {
+    if (s < 60) { return s + " s"; }
+    if (s < 3600) { return Math.floor(s / 60) + " min"; }
+    if (s < 86400) { return Math.floor(s / 3600) + "[[ h]] " + Math.floor(s % 3600 / 60) + " min"; }
+    return Math.floor(s / 86400) + " d " + Math.floor(s % 86400 / 3600) + "[[ h]]";
+  }
+
+  /* Text that is already there is left alone. */
+  function show(id, text) {
+    var e = typeof id === "string" ? $(id) : id;
+    if (e.textContent !== text) { e.textContent = text; }
+  }
+
+  /* Power is returned when the meter says so and nothing is being used. */
+  function returning(m) { return m.power_returned_w > 0 && !(m.power_delivered_w > 0); }
+
+  /* A phase's row and its cells: power, voltage and current, written like this. */
+  var phaseRows = [].slice.call(document.querySelectorAll(".phase"));
+  var phaseCells = phaseRows.map(function (row) { return [].slice.call(row.querySelectorAll("dd")); });
+  var PHASE_COLUMNS = [{ unit: "W", digits: 0 }, { unit: "V", digits: 1 }, { unit: "A", digits: 2, least: 0 }];
+  function phaseValues(p) {
+    var power = missing(p.delivered_w) && missing(p.returned_w) ? undefined :
+      (p.delivered_w || 0) - (p.returned_w || 0);
+    return [power, scaled(p.voltage_dv, 10), scaled(p.current_ma, 1000)];
+  }
+
+  /* `m`: the meter's values; without them (no telegram since Piepr started) a dash. */
+  function power(m) {
+    show("now-label", m && returning(m) ? "[[Returning now]]" : "[[Using now]]");
+    show("now", m ? number(returning(m) ? m.power_returned_w : m.power_delivered_w, "W", 0) : NONE);
+    /* A kind of value gets a column when any phase has it; a phase gets a row when it has any. */
+    var phases = (m ? m.phases : []).map(phaseValues);
+    var empty = phases.map(function (values) { return values.every(missing); });
+    $("phases").hidden = empty.every(Boolean);
+    phaseRows.forEach(function (row, n) {
+      row.hidden = empty[n] !== false;
+      if (row.hidden) { return; }
+      phaseCells[n].forEach(function (cell, k) {
+        var column = PHASE_COLUMNS[k];
+        cell.hidden = phases.every(function (values) { return missing(values[k]); });
+        show(cell, number(phases[n][k], column.unit, column.digits, column.least));
+      });
+    });
+  }
+
+  /* One counter of the meter. `counting`: it is the one that is running now. */
+  function reading(id, wh, wanted, counting) {
+    var row = $("row-" + id);
+    row.hidden = missing(wh) || !wanted;
+    row.querySelector("span").hidden = !counting;
+    show(id, number(scaled(wh, 1000), "kWh", 3));
+  }
+
+  function readings(m) {
+    /* A house that never returned anything has no use for those two rows. */
+    var returned = m.returned_t1_wh > 0 || m.returned_t2_wh > 0;
+    reading("t1", m.delivered_t1_wh, true, m.tariff === 1 && !returning(m));
+    reading("t2", m.delivered_t2_wh, true, m.tariff === 2 && !returning(m));
+    reading("r1", m.returned_t1_wh, returned, m.tariff === 1 && returning(m));
+    reading("r2", m.returned_t2_wh, returned, m.tariff === 2 && returning(m));
+    $("row-gas").hidden = missing(m.gas_l);
+    /* The gas meter reports now and then: say when. */
+    show("gas-label", "Gas" + (m.gas_time ? "[[, at ]]" + m.gas_time.slice(11, 16) : ""));
+    show("gas", number(scaled(m.gas_l, 1000), "m\u00b3", 3));
+    show("meter-name", m.name);
+    $("row-dsmr").hidden = missing(m.dsmr_version);
+    show("dsmr", Math.floor(m.dsmr_version / 10) + "." + m.dsmr_version % 10); /* 50 is 5.0, in any language */
+  }
+
+  function device(s) {
+    var t = s.telegrams;
+    show("last", missing(t.last_ok_ms) ? "[[none yet]]" :
+      t.last_ok_ms < 2500 ? "[[just now]]" : span(Math.round(t.last_ok_ms / 1000)) + "[[ ago]]");
+    show("ok", number(t.ok, "", 0));
+    show("bad", number(t.crc_errors + t.overflows, "", 0));
+    $("bad").className = t.last_rejected_ms < QUIET_MS ? "bad" : "";
+    show("readers", s.readers.connected + "[[ of ]]" + s.readers.max);
+    if (s.wifi.rssi !== rssi) {
+      rssi = s.wifi.rssi;
+      $("wifi").textContent = missing(rssi) ? NONE : "";
+      if (!missing(rssi)) {
+        $("wifi").appendChild(bars(rssi));
+        $("wifi").appendChild(document.createTextNode(number(rssi, "dBm", 0)));
+      }
+    }
+    show("uptime", span(s.uptime_s));
+    show("firmware", s.firmware);
+  }
+
+  /* The dot beats once for the telegrams that came since the last answer. */
+  $("dot").addEventListener("animationend", function () { $("dot").classList.remove("beat"); });
+
+  function render(s) {
+    var t = s.telegrams, seen = !missing(t.last_ok_ms);
+    var live = seen && t.last_ok_ms < QUIET_MS;
+    /* The meter's values change with a telegram, not with every answer. A Piepr
+     * that started again has none: what the page showed is from before. */
+    if (!seen) {
+      power(null);
+      shown = null;
+    } else if (t.ok !== shown) {
+      power(s.meter);
+      readings(s.meter);
+      if (live && shown !== null) { $("dot").classList.add("beat"); }
+      shown = t.ok;
+    }
+    $("meter").hidden = !seen;
+    device(s);
+    $("values").hidden = false;
+    answeredAt = Date.now();
+    document.body.className = live ? "reading" : !seen && s.uptime_s * 1000 < QUIET_MS ? "starting" : "quiet";
+  }
+
+  /* One request at a time, and none while nobody is looking. Piepr is gone when
+   * FAILS requests in a row got no answer; what was shown stays, dimmed. */
+  function poll() {
+    if (busy || document.hidden) { return; }
+    busy = true;
+    var stop = new AbortController();
+    var timer = setTimeout(function () { stop.abort(); }, TIMEOUT_MS);
+    fetch("api/status", { cache: "no-store", signal: stop.signal })
+      .then(function (r) {
+        if (!r.ok) { throw new Error(r.status); }
+        return r.json();
+      })
+      .then(function (s) { fails = 0; render(s); })
+      .catch(function () { if (++fails >= FAILS) { document.body.className = "gone"; } })
+      .then(function () { clearTimeout(timer); busy = false; });
+  }
+
+  /* Back in sight: what is on the page may be hours old until Piepr answers. */
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && answeredAt && Date.now() - answeredAt > 2 * POLL_MS) { document.body.className = "old"; }
+    poll();
+  });
+  setInterval(poll, POLL_MS);
+  poll();
+})();
+</script>
+</body>
+</html>
