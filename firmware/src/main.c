@@ -171,7 +171,8 @@ void app_main(void)
     bool trouble;
     const char *why = start_reason(reset, &trouble);
     ESP_LOG_LEVEL(trouble ? ESP_LOG_WARN : ESP_LOG_INFO, TAG,
-                  "piepr %s starting after %s (reset reason %d)", FW_VERSION, why, (int)reset);
+                  "piepr %s on %s starting after %s (reset reason %d)", FW_VERSION, BOARD_NAME, why,
+                  (int)reset);
 
     bool nvs_ok = nvs_init();
     bool setup_requested = setup_portal_requested();

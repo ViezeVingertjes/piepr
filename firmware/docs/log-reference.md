@@ -9,7 +9,7 @@ chip itself.
 
 | Message | Meaning |
 |---|---|
-| `main: piepr <version> starting after … (reset reason N)` | start-up, with the cause in words: power-on, a restart, a reset over USB. A warning after a crash, a hang (watchdog) or a power dip (weak charger or cable) |
+| `main: piepr <version> on <board> starting after … (reset reason N)` | start-up, on which board, with the cause in words: power-on, a restart, a reset over USB. A warning after a crash, a hang (watchdog) or a power dip (weak charger or cable) |
 | `main: fw …, uptime …, clients n/5, heap free …, rssi …` | heartbeat every 5 minutes |
 | `main: no WiFi for N s, restarting` | 15 min offline |
 | `main: no readers for N s while online, restarting` | readers seen before, none for 30 min while online |
@@ -32,6 +32,7 @@ chip itself.
 | `setup: saved WiFi settings for "…", restarting` | saved |
 | `setup: setup timeout, restarting` | no page activity for 10 min (5 after recovery); only with a known network |
 | `button: hold BOOT for 5 s to start WiFi setup` | button armed |
+| `button: no setup button on this board` | WiFi setup only comes back through recovery (or a reflash) |
 | `mdns: announcing piepr.local, _dsmr._tcp port 8088` | mDNS up |
 | `tcp: listening on port 8088 (max 5 clients)` | server up |
 | `tcp: client … connected (n/5)` / `disconnected (n/5)` | reader joined/left |
@@ -39,7 +40,7 @@ chip itself.
 | `tcp: client sent data (not allowed), disconnected` | readers must only read |
 | `tcp: client dropped (too slow, sent N) / (send error N) (n/5)` | reader too slow or gone |
 | `tcp: client slot N connection error (errno N)` | aborted/reset (113 keepalive timeout, 104 reset by peer) |
-| `p1: reading P1 on GPIO4, 115200 baud, inverted` | UART up |
+| `p1: reading P1 on GPIO4, 115200 baud, inverted` | UART up (GPIO4 on the SuperMini, GPIO9 on the XIAO ESP32-S3) |
 | `p1: telegrams arriving from "…" (N bytes each)` | the first valid telegram, with the meter's own type name; shown again when telegrams return after a silent minute |
 | `p1: last 60s: ok N, crc N, overflow N, uart errors N; last valid telegram Ns ago` | every minute; DSMR 4: `ok 6`, errors 0 |
 | same, as warning with `(check wiring / pull-up / pin 2)` | nothing valid for ≥ 60 s |

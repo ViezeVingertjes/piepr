@@ -13,7 +13,7 @@ if [ "$have" != "$WANTED" ]; then
     exit 1
 fi
 
-files=(src/*.[ch] lib/*/*/*.[ch] test/*/*.c fuzz/*.c)
+files=(src/*.[ch] src/boards/*.h lib/*/*/*.[ch] test/*/*.c fuzz/*.c)
 if [ "${1:-}" = "--check" ]; then
     clang-format --dry-run -Werror "${files[@]}"
 else

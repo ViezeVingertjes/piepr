@@ -162,15 +162,15 @@ void p1_reader_start(void)
     ESP_ERROR_CHECK(uart_driver_install(P1_UART_NUM, UART_RX_BUF_SIZE, 0, UART_EVENT_QUEUE_LEN,
                                         &s_uart_queue, ESP_INTR_FLAG_IRAM));
     ESP_ERROR_CHECK(uart_param_config(P1_UART_NUM, &cfg));
-    ESP_ERROR_CHECK(uart_set_pin(P1_UART_NUM, UART_PIN_NO_CHANGE, P1_RX_GPIO, UART_PIN_NO_CHANGE,
-                                 UART_PIN_NO_CHANGE));
+    ESP_ERROR_CHECK(uart_set_pin(P1_UART_NUM, UART_PIN_NO_CHANGE, BOARD_P1_RX_GPIO,
+                                 UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
     ESP_ERROR_CHECK(uart_set_line_inverse(P1_UART_NUM, UART_SIGNAL_RXD_INV));
     /* Headroom when interrupts are briefly delayed. */
     ESP_ERROR_CHECK(uart_set_rx_full_threshold(P1_UART_NUM, UART_RX_FULL_THRESHOLD));
-    gpio_pullup_en(P1_RX_GPIO); /* in parallel with the external 2.2k */
+    gpio_pullup_en(BOARD_P1_RX_GPIO); /* in parallel with the external 2.2k */
 
     BaseType_t ok = xTaskCreate(reader_task, "p1_reader", P1_READER_TASK_STACK, NULL,
                                 P1_READER_TASK_PRIO, NULL);
     configASSERT(ok == pdPASS);
-    ESP_LOGI(TAG, "reading P1 on GPIO%d, %d baud, inverted", P1_RX_GPIO, P1_BAUD);
+    ESP_LOGI(TAG, "reading P1 on GPIO%d, %d baud, inverted", BOARD_P1_RX_GPIO, P1_BAUD);
 }

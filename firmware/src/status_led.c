@@ -19,7 +19,7 @@ static atomic_bool s_setup;
 
 static void led_write(bool on)
 {
-    gpio_set_level(LED_GPIO, on ? 0 : 1); /* active low */
+    gpio_set_level(BOARD_LED_GPIO, on != BOARD_LED_ACTIVE_LOW);
 }
 
 static void tick_cb(void *arg)
@@ -44,8 +44,8 @@ static void tick_cb(void *arg)
 
 void status_led_init(void)
 {
-    gpio_reset_pin(LED_GPIO);
-    gpio_set_direction(LED_GPIO, GPIO_MODE_OUTPUT);
+    gpio_reset_pin(BOARD_LED_GPIO);
+    gpio_set_direction(BOARD_LED_GPIO, GPIO_MODE_OUTPUT);
     led_write(false);
 
     esp_timer_handle_t timer;

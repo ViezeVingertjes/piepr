@@ -59,6 +59,18 @@ een telegram.
 Gebruik GPIO2, GPIO8 en GPIO9 niet (strapping-pinnen; GPIO8 is het lampje, GPIO9 de
 BOOT-knop).
 
+### XIAO ESP32-S3
+
+Dezelfde onderdelen en stappen werken voor de XIAO ESP32-S3 (niet "Sense" of "Plus").
+Zet de antenne erop voordat je hem aanzet. Waar deze gids een vlakje van de SuperMini
+noemt, neem je dat van de XIAO eronder:
+
+| SuperMini | 5V | G | 3.3 | 4 |
+|---|---|---|---|---|
+| **XIAO ESP32-S3** | **5V** | **GND** | **3V3** | **D10** (GPIO9) |
+
+Het statuslampje is het oranje; het rode laadlampje gaat na ongeveer 30 s uit.
+
 ---
 
 ## 3. Bouwen

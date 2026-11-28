@@ -1,7 +1,7 @@
 name: Release
 
-# A pushed tag (v1.2.3) builds the image and opens a draft release with the
-# notes from CHANGELOG.md. A manual run only builds the image, as an artifact.
+# A pushed tag (v1.2.3) builds an image per board and opens a draft release with the
+# notes from CHANGELOG.md. A manual run only builds the images, as an artifact.
 on:
   push:
     tags: ["v*"]
@@ -30,7 +30,7 @@ jobs:
         working-directory: firmware
       - run: pio run
         working-directory: firmware
-      - name: Build the image
+      - name: Build the images
         id: image
         working-directory: firmware
         run: |
@@ -43,7 +43,7 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v7
         with:
-          name: image
+          name: images
           path: firmware/out/
       - name: Draft the release
         if: github.event_name == 'push'

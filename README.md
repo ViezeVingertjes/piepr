@@ -21,7 +21,8 @@ available on your own network. No app, no account, no cloud.
 - WiFi setup from your phone, with a list of nearby networks
 - Recovers by itself: when it can't join your WiFi, the setup hotspot comes back and
   says why
-- About €5 in parts: an ESP32-C3 SuperMini, an RJ12 cable, a resistor and a diode
+- About €5 in parts: an ESP32-C3 SuperMini (or a XIAO ESP32-S3), an RJ12 cable, a
+  resistor and a diode
 - Wired by hand, or on a small [circuit board](hardware/pcb) you can have made
 
 <p align="center">

@@ -56,6 +56,18 @@ every second.
 
 Don't use GPIO2, GPIO8 or GPIO9 (strapping pins; GPIO8 is the LED, GPIO9 BOOT).
 
+### XIAO ESP32-S3
+
+The same parts and steps work for the XIAO ESP32-S3 (not "Sense" or "Plus"). Fit its
+antenna before powering it up. Wherever this guide names a SuperMini pad, use the
+XIAO pad below it:
+
+| SuperMini | 5V | G | 3.3 | 4 |
+|---|---|---|---|---|
+| **XIAO ESP32-S3** | **5V** | **GND** | **3V3** | **D10** (GPIO9) |
+
+The status light is the orange one; the red charge light goes out after about 30 s.
+
 ---
 
 ## 3. Build steps

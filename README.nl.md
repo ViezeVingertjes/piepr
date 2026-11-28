@@ -21,8 +21,8 @@ elke meting staat op je eigen netwerk. Geen app, geen account, geen cloud.
 - Wifi stel je in op je telefoon: je kiest uit een lijst met netwerken in de buurt
 - Herstelt zichzelf: komt hij niet op je wifi, dan komt de setup-hotspot terug en zie
   je waarom
-- Ongeveer €5 aan onderdelen: een ESP32-C3 SuperMini, een RJ12-kabel, een weerstand en
-  een diode
+- Ongeveer €5 aan onderdelen: een ESP32-C3 SuperMini (of een XIAO ESP32-S3), een
+  RJ12-kabel, een weerstand en een diode
 - Met de hand bedraad, of op een kleine [printplaat](hardware/pcb) die je kunt laten
   maken
 

@@ -60,10 +60,11 @@ jobs:
       - uses: actions/cache@v6
         with:
           path: ~/.platformio
-          key: pio-${{ hashFiles('firmware/platformio.ini', 'firmware/dependencies.lock') }}
+          key: pio-${{ hashFiles('firmware/platformio.ini', 'firmware/dependencies.lock.*') }}
       - run: pip install platformio==6.2.0
       # The setup password of the release firmware; it is public.
       - run: printf '[secrets]\nsetup_pass = piepr1234\n' > firmware/secrets.ini
+      # Every board in platformio.ini's default_envs.
       - run: pio run
         working-directory: firmware
       # Keep the toolchain in the cache, not the downloads it was unpacked from.
@@ -71,7 +72,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: firmware
-          path: firmware/.pio/build/supermini/firmware.bin
+          path: firmware/.pio/build/*/firmware.bin
           retention-days: 7
 
   fuzz-targets:

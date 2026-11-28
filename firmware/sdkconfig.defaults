@@ -1,5 +1,6 @@
 # ESP-IDF settings applied on top of the defaults. After changing this file do a
-# clean build: rm -rf .pio/build/supermini sdkconfig.supermini
+# clean build of each board: rm -rf .pio/build/<board> sdkconfig.<board>
+# These settings are for all boards.
 
 # Log console over the built-in USB (USB-Serial-JTAG); UART1 stays free for P1.
 CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
@@ -28,7 +29,8 @@ CONFIG_HTTPD_ENABLE_EVENTS=n
 # No FreeRTOS software timers are used (esp_timer instead): no "Tmr Svc" task.
 CONFIG_FREERTOS_USE_TIMERS=n
 
-# The ESP32-C3 SuperMini has 4 MB of flash (the default config assumes 2 MB).
+# Every board uses the same 4 MB flash layout (partitions.csv); a board with more
+# flash leaves the rest unused. The default config assumes 2 MB.
 CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
 
 # The bootloader can fall back to the previous firmware slot when a newly

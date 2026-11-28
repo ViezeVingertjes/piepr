@@ -3,6 +3,8 @@
 ## Unreleased
 
 - A circuit board for the same parts, with an RJ12 socket: [hardware/pcb](hardware/pcb)
+- Also runs on the Seeed Studio XIAO ESP32-S3 ([build guide](hardware/README.md))
+- The release has one file per board, such as `piepr-supermini-<version>.bin`
 
 ## 1.2.1 - 2026-11-27
 

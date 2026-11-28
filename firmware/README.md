@@ -7,6 +7,7 @@ telegrams raw on **TCP port 8088** (up to 5 readers; a 6th replaces the one conn
 - Stack: ESP-IDF 6.1.1 via PlatformIO (`espressif32 @ 8.0.0`), C. Only extra
   dependency: Espressif's `mdns` component.
 - Meters: DSMR 4.x and 5.x, and Belgian e-MUCS P1; see the [meters table](../README.md#meters).
+- Boards: see [Boards](#boards).
 - Hardware: see the [build guide](../hardware/README.md).
 
 ## Flash a release (nothing to install)
@@ -14,10 +15,11 @@ Open [piepr.nl/en/install](https://piepr.nl/en/install/) in Chrome or Edge on a
 computer, plug in the board with a USB cable that carries data, click **Install Piepr**
 and pick the board's port. Not listed? Hold BOOT while plugging it in.
 
-By hand: download the `.bin` file from the
+By hand: download your board's file from the
 [latest release](https://github.com/ViezeVingertjes/piepr/releases/latest) and write it
 at address `0x0`, for example with
-`esptool.py --chip esp32c3 write_flash 0x0 piepr-<version>.bin`.
+`esptool --chip esp32c3 write-flash 0x0 piepr-supermini-<version>.bin` or
+`esptool --chip esp32s3 write-flash 0x0 piepr-xiao-s3-<version>.bin`.
 
 The release uses setup password **piepr1234**; for your own, build it yourself.
 Flashing a release also clears the saved WiFi network: set it up again from your phone.
@@ -28,7 +30,7 @@ downloads the toolchain.
 ```bash
 cd firmware
 cp secrets.ini.example secrets.ini   # set setup_pass (never committed)
-pio run -t upload                    # build + flash over USB
+pio run -e supermini -t upload       # build + flash over USB (or -e xiao-s3)
 pio device monitor                   # log
 nc piepr.local 8088                  # a telegram every 10 s (DSMR 4) / 1 s (DSMR 5)
 ```
@@ -80,12 +82,13 @@ device retries the saved network. A temporary outage needs no action.
 | Path | Contents |
 |---|---|
 | `src/main.c` | Start-up (normal or setup boot); supervisor (heartbeat, restarts) |
-| `src/config.h` | Tunables: pins, hostname, port, limits, timings (recovery thresholds: `lib/portalcore/include/recovery.h`) |
-| `src/p1_reader.c` | UART on GPIO4 (inverted) → framer → broadcast; per-minute stats |
+| `src/config.h` | Tunables: hostname, port, limits, timings (recovery thresholds: `lib/portalcore/include/recovery.h`) |
+| `src/board.h`, `src/boards/` | The board being built (from its env in `platformio.ini`): pins, LED, setup button |
+| `src/p1_reader.c` | UART on the board's P1 pin (inverted) → framer → broadcast; per-minute stats |
 | `src/tcp_server.c` | TCP server: client slots (oldest evicted when full), non-blocking sends |
 | `src/wifi.c` | Station with back-off and recovery counters; setup hotspot; scans |
 | `src/wifi_credentials.c` | The saved network (NVS, written by the setup portal) |
-| `src/setup_button.c` | BOOT long-press, polled from the LED tick |
+| `src/setup_button.c` | BOOT long-press, polled from the LED tick (nothing on a board without a button) |
 | `src/setup_portal.c` | Setup request/restart; setup boot: hotspot, web form, captive DNS, timeout |
 | `src/mdns_announce.c` | mDNS hostname + service |
 | `src/status_led.c` | LED patterns; 125 ms tick also polls the button |
@@ -95,8 +98,9 @@ device retries the saved network. A temporary outage needs no action.
 | `test/` | Unity tests, one folder per module (`pio test -e native`) |
 | `fuzz/` | libFuzzer harnesses: `fuzz/run.sh <target> [seconds]` |
 | `scripts/` | Build steps: `gen_secrets.py`, `gen_version.py`, `gen_web.py` (with `web_pages.py` and its tests), `gen_common.py`, `native_sanitizers.py`; `release_image.sh` makes the release file; `format.sh` formats the C code |
-| `sdkconfig.defaults` | ESP-IDF options (explained in the file) |
-| `partitions.csv` | Flash layout: two firmware slots and the settings |
+| `sdkconfig.defaults` | ESP-IDF options for every board (explained in the file) |
+| `dependencies.lock.<chip>` | Pinned component versions, one file per chip (`esp32c3`, `esp32s3`) |
+| `partitions.csv` | Flash layout, the same on every board: two firmware slots and the settings |
 
 Conventions: module name as function prefix (`tcp_server_*`), file-static state `s_`,
 constants `UPPER_CASE`. Format with `scripts/format.sh`.
@@ -105,12 +109,36 @@ constants `UPPER_CASE`. Format with `scripts/format.sh`.
 - `secrets.ini` (from `secrets.ini.example`):
   - `setup_pass`: hotspot password, 8–63 bytes (the build fails otherwise).
   - Value = everything after the first `=`, trimmed; spaces, quotes, `\`, `;`, `#` are fine.
-- App settings: `src/config.h`.
-- ESP-IDF options: `sdkconfig.defaults`. After changing it or the ESP-IDF version:
-  `rm -rf .pio/build/supermini sdkconfig.supermini`.
+- App settings: `src/config.h`; pins: `src/boards/<board>.h`.
+- ESP-IDF options: `sdkconfig.defaults`. After changing it or the ESP-IDF version, for
+  each board: `rm -rf .pio/build/<board> sdkconfig.<board>`.
 - Compiler warnings in `src/` are errors.
 
-## LED (GPIO8)
+## Boards
+| Env (`-e`) | Board | Chip | P1 data | LED | Setup button |
+|---|---|---|---|---|---|
+| `supermini` | ESP32-C3 SuperMini | ESP32-C3 | GPIO4 (pad 4) | GPIO8 | BOOT (GPIO9) |
+| `xiao-s3` | Seeed Studio XIAO ESP32-S3 | ESP32-S3 | GPIO9 (D10) | GPIO21 | BOOT (GPIO0) |
+
+`pio run` builds every board. The release has `piepr-<board>-<version>.bin` per board,
+and a `manifest.json` listing each board's chip and image: the installer at piepr.nl
+picks the image by the chip it finds. Every board has the same flash layout.
+
+Adding a board:
+1. `src/boards/<board>.h` (the env name, `-` written as `_`) with the settings listed
+   in `src/board.h`. It checks the chip (`CONFIG_IDF_TARGET_*`). Leave
+   `BOARD_SETUP_BUTTON_GPIO` out if there is no button: WiFi setup then comes back only
+   through [recovery](#automatic-recovery). Keep P1 off strapping pins and USB pins.
+2. A line for it in `src/board.h`.
+3. `[env:<board>]` in `platformio.ini` (`extends = esp32`, its `board`, and
+   `build_flags = -DPIEPR_BOARD_<BOARD>`), added to `default_envs` so that CI builds it
+   and the release includes it.
+4. A new chip also gets a `dependencies.lock.<chip>`: the first build writes it; commit
+   it. A second board with a chip that is already supported needs a board choice in
+   the piepr.nl installer first, which tells boards apart by chip.
+5. Its row in the table above, and its pads in the [build guide](../hardware/README.md).
+
+## LED
 | LED | Meaning |
 |---|---|
 | even blink (2 Hz) | no WiFi / no IP |
@@ -135,7 +163,7 @@ The log lines are explained in the [log reference](docs/log-reference.md).
 | Symptom | Check |
 |---|---|
 | `ok 0`, uart errors 0 | pin 2 (Data Request) at 5 V? cable seated? |
-| `crc` / `uart errors` high | 2.2 kΩ pull-up to 3V3; data wire on GPIO4 |
+| `crc` / `uart errors` high | 2.2 kΩ pull-up to 3V3; data wire on the P1 pin ([Boards](#boards)) |
 | LED keeps blinking evenly | WiFi details; weak signal (RSSI). Setup appears after 5 min |
 | Network missing from the setup list | 5 GHz only, weak signal, hidden SSID (use *Other network…*), or a non-UTF-8 name (rename it) |
 | Setup page doesn't open | forget `Piepr-Setup` on the phone and rejoin, or browse to `http://192.168.4.1` |
