@@ -2,7 +2,6 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
 
 #include "p1_parse.h"
 
@@ -16,6 +15,23 @@ static void check_time(const p1_time_t *t)
     }
 }
 
+/* Field by field: padding bytes may differ between two equal structs. */
+static void check_same(const p1_values_t *a, const p1_values_t *b)
+{
+    const p1_num_t *na = &a->version, *nb = &b->version;
+    size_t count = (size_t)(&a->gas_l - na) + 1; /* every p1_num_t, version .. gas_l */
+    for (size_t i = 0; i < count; i++) {
+        assert(na[i].present == nb[i].present && na[i].value == nb[i].value);
+    }
+    const p1_time_t *ta[] = { &a->time, &a->gas_time }, *tb[] = { &b->time, &b->gas_time };
+    for (size_t i = 0; i < 2; i++) {
+        assert(ta[i]->present == tb[i]->present && ta[i]->year == tb[i]->year &&
+               ta[i]->month == tb[i]->month && ta[i]->day == tb[i]->day &&
+               ta[i]->hour == tb[i]->hour && ta[i]->minute == tb[i]->minute &&
+               ta[i]->second == tb[i]->second && ta[i]->summer == tb[i]->summer);
+    }
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     p1_values_t v, again;
@@ -25,6 +41,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     assert(v.gas_l.present == v.gas_time.present);
     /* The same input always gives the same values. */
     assert(p1_parse(data, size, &again) == found);
-    assert(memcmp(&v, &again, sizeof(v)) == 0);
+    check_same(&v, &again);
     return 0;
 }

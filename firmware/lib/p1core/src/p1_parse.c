@@ -169,8 +169,9 @@ static bool parse_time(span_t g, p1_time_t *out)
         .summer = g.s[TIME_DIGITS] == 'S',
         .present = true,
     };
-    if (t.month < 1 || t.month > 12 || t.day < 1 || t.day > 31 || t.hour > 23 || t.minute > 59 ||
-        t.second > 59) {
+    static const uint8_t DAYS[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    if (t.month < 1 || t.month > 12 || t.day < 1 || t.day > DAYS[t.month - 1] || t.hour > 23 ||
+        t.minute > 59 || t.second > 59) {
         return false;
     }
     *out = t;
@@ -194,24 +195,52 @@ static p1_num_t *field_num(const p1_values_t *v, const field_t *f)
     return (p1_num_t *)((const uint8_t *)v + f->offset);
 }
 
+/* What each M-Bus channel said; the gas meter is picked once all lines are read,
+ * because the device type may come after the reading. Index 0 is unused. */
+typedef struct {
+    uint8_t type; /* 0-n:24.1.0; 0: not said */
+    p1_num_t litres;
+    p1_time_t time;
+} channel_t;
+
 typedef struct {
     p1_values_t *out;
-    uint8_t device_type[GAS_CHANNELS + 1]; /* per channel; 0: not said (yet) */
+    channel_t channels[GAS_CHANNELS + 1];
 } parser_t;
 
-static void parse_gas(parser_t *p, span_t groups, unsigned channel)
+static void parse_reading(channel_t *c, span_t groups)
 {
-    uint8_t type = p->device_type[channel];
     span_t when, reading;
     p1_time_t t;
     uint32_t litres;
-    if (p->out->gas_l.present || (type != 0 && type != DEVICE_GAS) || !group(groups, 0, &when) ||
-        !group(groups, 1, &reading) || !parse_time(when, &t) ||
-        !parse_number(reading, "m3", 3, &litres)) {
-        return;
+    if (group(groups, 0, &when) && group(groups, 1, &reading) && parse_time(when, &t) &&
+        parse_number(reading, "m3", 3, &litres)) {
+        c->litres = (p1_num_t){ litres, true };
+        c->time = t;
     }
-    p->out->gas_l = (p1_num_t){ litres, true };
-    p->out->gas_time = t;
+}
+
+/* The first channel that says it is a gas meter, else the first that doesn't say. */
+static void pick_gas(const parser_t *p, p1_values_t *out)
+{
+    const channel_t *pick = NULL;
+    for (unsigned n = 1; n <= GAS_CHANNELS; n++) {
+        const channel_t *c = &p->channels[n];
+        if (!c->litres.present) {
+            continue;
+        }
+        if (c->type == DEVICE_GAS) {
+            pick = c;
+            break;
+        }
+        if (c->type == 0 && pick == NULL) {
+            pick = c;
+        }
+    }
+    if (pick != NULL) {
+        out->gas_l = pick->litres;
+        out->gas_time = pick->time;
+    }
 }
 
 static void parse_line(parser_t *p, span_t line)
@@ -235,13 +264,14 @@ static void parse_line(parser_t *p, span_t line)
     }
     unsigned channel = mbus_channel(obis, &tail);
     if (channel != 0) {
+        channel_t *c = &p->channels[channel];
         uint32_t type;
         if (span_is(tail, ":24.1.0")) {
             if (group(groups, 0, &g) && parse_number(g, NULL, 0, &type) && type <= UINT8_MAX) {
-                p->device_type[channel] = (uint8_t)type;
+                c->type = (uint8_t)type;
             }
         } else if (span_is(tail, ":24.2.1") || span_is(tail, ":24.2.3")) {
-            parse_gas(p, groups, channel);
+            parse_reading(c, groups);
         }
         return;
     }
@@ -284,5 +314,6 @@ size_t p1_parse(const uint8_t *telegram, size_t len, p1_values_t *out)
         parse_line(&p, (span_t){ telegram + start, end - start });
         start = end + 1;
     }
+    pick_gas(&p, out);
     return count_found(out);
 }

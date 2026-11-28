@@ -28,13 +28,13 @@ typedef struct {
 #define P1_PHASES 3
 
 typedef struct {
-    p1_time_t time;                        /* 0-0:1.0.0 */
-    p1_num_t version;                      /* 1-3:0.2.8, e.g. 50 for DSMR 5.0 */
-    p1_num_t tariff;                       /* 0-0:96.14.0: usually 1 or 2 */
-    p1_num_t delivered_wh[2];              /* 1-0:1.8.1, 1.8.2: per tariff */
-    p1_num_t returned_wh[2];               /* 1-0:2.8.1, 2.8.2 */
-    p1_num_t power_delivered_w;            /* 1-0:1.7.0 */
-    p1_num_t power_returned_w;             /* 1-0:2.7.0 */
+    p1_time_t time;             /* 0-0:1.0.0 */
+    p1_num_t version;           /* 1-3:0.2.8, e.g. 50 for DSMR 5.0; not sent in Belgium */
+    p1_num_t tariff;            /* 0-0:96.14.0: usually 1 or 2 */
+    p1_num_t delivered_wh[2];   /* 1-0:1.8.1, 1.8.2: per tariff */
+    p1_num_t returned_wh[2];    /* 1-0:2.8.1, 2.8.2 */
+    p1_num_t power_delivered_w; /* 1-0:1.7.0 */
+    p1_num_t power_returned_w;  /* 1-0:2.7.0 */
     p1_num_t phase_delivered_w[P1_PHASES]; /* 1-0:21/41/61.7.0 */
     p1_num_t phase_returned_w[P1_PHASES];  /* 1-0:22/42/62.7.0 */
     p1_num_t voltage_dv[P1_PHASES];        /* 1-0:32/52/72.7.0, tenths of a volt */
@@ -45,6 +45,8 @@ typedef struct {
 
 /* Fills `out` from one complete telegram (`len` bytes), as p1_framer_telegram()
  * returns it. Lines it doesn't know, or can't read, are skipped; the rest still
- * counts. Gas is taken from the first channel that is a gas meter (device type 3)
- * or doesn't say. Returns the number of values found. */
+ * counts. Gas is taken from the first channel that says it is a gas meter
+ * (device type 3), else from the first that doesn't say. Dates are checked
+ * against the length of the month (29 February is always allowed). Returns the number of values
+ * found. */
 size_t p1_parse(const uint8_t *telegram, size_t len, p1_values_t *out);

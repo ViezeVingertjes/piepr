@@ -253,7 +253,9 @@ void test_bad_timestamps(void)
         "/X\r\n0-0:1.0.0(261328150934W)\r\n",  "/X\r\n0-0:1.0.0(261100150934W)\r\n",
         "/X\r\n0-0:1.0.0(261132150934W)\r\n",  "/X\r\n0-0:1.0.0(261128240934W)\r\n",
         "/X\r\n0-0:1.0.0(261128156034W)\r\n",  "/X\r\n0-0:1.0.0(261128150960W)\r\n",
-        "/X\r\n0-0:1.0.0(2611281509340W)\r\n", "/X\r\n0-0:1.0.0(26112815093aW)\r\n",
+        "/X\r\n0-0:1.0.0(2611281509340W)\r\n", "/X\r\n0-0:1.0.0(260231150934W)\r\n",
+        "/X\r\n0-0:1.0.0(260230150934W)\r\n",  "/X\r\n0-0:1.0.0(261131150934W)\r\n",
+        "/X\r\n0-0:1.0.0(26112815093aW)\r\n",
     };
     assert_nothing_found(bad, sizeof(bad) / sizeof(bad[0]));
 }
@@ -272,6 +274,24 @@ void test_gas_from_the_gas_meter_only(void)
     TEST_ASSERT_EQUAL(10, v.gas_time.minute);
 }
 
+void test_gas_meter_preferred_whatever_the_order(void)
+{
+    p1_values_t v;
+    /* Channel 1 doesn't say what it is; channel 2 says gas, after its reading. */
+    parse("/X\r\n"
+          "0-1:24.2.1(261128150000W)(00123.456*m3)\r\n"
+          "0-2:24.2.1(261128151000W)(20951.868*m3)\r\n"
+          "0-2:24.1.0(003)\r\n",
+          &v);
+    assert_num(20951868, v.gas_l);
+    /* A type after the reading still counts: channel 1 is water. */
+    parse("/X\r\n"
+          "0-1:24.2.1(261128150000W)(00001.000*m3)\r\n"
+          "0-1:24.1.0(007)\r\n",
+          &v);
+    TEST_ASSERT_FALSE(v.gas_l.present);
+}
+
 void test_gas_without_device_type_and_first_one_wins(void)
 {
     p1_values_t v;
@@ -280,6 +300,14 @@ void test_gas_without_device_type_and_first_one_wins(void)
           "0-4:24.2.1(261128150000W)(00002.000*m3)\r\n",
           &v);
     assert_num(1000, v.gas_l);
+}
+
+void test_last_day_of_the_month(void)
+{
+    p1_values_t v;
+    TEST_ASSERT_EQUAL(1, parse("/X\r\n0-0:1.0.0(240229000000W)\r\n", &v));
+    TEST_ASSERT_EQUAL(1, parse("/X\r\n0-0:1.0.0(261231235959W)\r\n", &v));
+    TEST_ASSERT_EQUAL(1, parse("/X\r\n0-0:1.0.0(260430120000S)\r\n", &v));
 }
 
 void test_bad_gas_lines(void)
@@ -342,7 +370,9 @@ int main(void)
     RUN_TEST(test_largest_number);
     RUN_TEST(test_bad_timestamps);
     RUN_TEST(test_gas_from_the_gas_meter_only);
+    RUN_TEST(test_gas_meter_preferred_whatever_the_order);
     RUN_TEST(test_gas_without_device_type_and_first_one_wins);
+    RUN_TEST(test_last_day_of_the_month);
     RUN_TEST(test_bad_gas_lines);
     RUN_TEST(test_lines_that_look_alike_are_not_mixed_up);
     RUN_TEST(test_later_line_replaces_earlier);
