@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.4.0 - 2026-11-28
 
 - A status page on the device: open `http://piepr.local` for the power right now, per
   phase, the meter readings and gas, and how Piepr itself is doing: when the last
@@ -12,6 +12,8 @@
 - After saving WiFi, the setup page points at the status page
 - The pages are built from shared pieces, and comments and spare whitespace are left
   out of what goes into the firmware
+- Installing 1.4.0 goes over USB, from [piepr.nl/installeren](https://piepr.nl/installeren/)
+  or by hand, and clears the saved WiFi network: set it up again from your phone
 
 ## 1.3.0 - 2026-11-28
 
