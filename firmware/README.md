@@ -93,7 +93,7 @@ device retries the saved network. A temporary outage needs no action.
 | `src/mdns_announce.c` | mDNS hostname + service |
 | `src/status_led.c` | LED patterns; 125 ms tick also polls the button |
 | `web/` | Setup pages, written once in English: text marked `[[like this]]` is translated with `nl.json`, shared pieces live in `parts/`. Built into the firmware gzipped, in English and Dutch |
-| `lib/p1core/` | Pure C: `crc16`, `p1_framer`, `p1_ident` (the meter's type name, for the log) |
+| `lib/p1core/` | Pure C: `crc16`, `p1_framer`, `p1_ident` (the meter's type name, for the log), `p1_parse` (the values in a telegram: readings, power, voltage, current, gas) |
 | `lib/portalcore/` | Pure C: `wifi_form`, `captive_dns`, `channel_pick`, `json_escape`, `lang_pick`, `setup_state` (network list, page JSON), `recovery` |
 | `test/` | Unity tests, one folder per module (`pio test -e native`) |
 | `fuzz/` | libFuzzer harnesses: `fuzz/run.sh <target> [seconds]` |
